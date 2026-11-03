@@ -1,0 +1,46 @@
+<h2>Model Source</h2>
+
+<p class="intro">
+  Configure where the serving runtime loads the model from.
+</p>
+
+<div class="info-box">
+  <strong>Optional</strong>
+
+  <p>
+    Skip this step if your serving runtime already contains the model
+  </p>
+</div>
+
+
+<div class="field">
+
+  <label>Persistent Volume Claim</label>
+
+  <select [(ngModel)]="wizard.pvcName">
+
+    <option value="">
+      Select PVC
+    </option>
+
+    <option
+      *ngFor="let pvc of pvcs"
+      [value]="pvc.name">
+
+      {{ pvc.name }}
+
+    </option>
+
+  </select>
+
+</div>
+
+<div class="field">
+
+  <label>Mount Path</label>
+
+  <input
+    [(ngModel)]="wizard.mountPath"
+    placeholder="/mnt/models">
+
+</div>

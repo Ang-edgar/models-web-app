@@ -1,0 +1,364 @@
+<div class="lib-content-wrapper">
+
+<h3>
+Step {{ currentStep }} / 5
+</h3>
+
+  <lib-title-actions-toolbar
+    title="New KServe Deployment Wizard"
+    [buttons]="[]"
+    [backButton]="true">
+  </lib-title-actions-toolbar>
+  <!--Step 1-->
+  <div *ngIf="currentStep === 1">
+
+    <h2>Step 1 - Basic Information</h2>
+
+    <mat-form-field appearance="outline" style="width:100%">
+      <mat-label>Deployment Name</mat-label>
+      <input
+        matInput
+        [(ngModel)]="wizard.deploymentName">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width:100%">
+      <mat-label>Serving Runtime</mat-label>
+
+      <mat-select
+        [(ngModel)]="wizard.runtime">
+
+        <mat-option value="vllm">
+          vLLM OpenAI
+        </mat-option>
+
+        <mat-option value="triton">
+          Hugging Face
+        </mat-option>
+
+        <mat-option value="custom">
+          Custom Runtime
+        </mat-option>
+
+      </mat-select>
+
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width:100%">
+      <mat-label>Namespace</mat-label>
+
+      <input
+        matInput
+        [value]="wizard.namespace"
+        readonly>
+
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width:100%">
+      <mat-label>Service Account</mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="wizard.serviceAccount">
+
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width:100%">
+
+      <mat-label>Serving Runtime Image</mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="wizard.runtimeImage">
+
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width:100%">
+      <mat-label>Description</mat-label>
+      <textarea
+        matInput
+        rows="3"
+        [(ngModel)]="wizard.description">
+      </textarea>
+    </mat-form-field>
+
+  </div>
+  <!--Step 2-->
+  <div *ngIf="currentStep === 2">
+
+    <h2>Step 2 - Volume Configuration</h2>
+
+    <mat-form-field appearance="outline" style="width:100%">
+      <mat-label>Volume</mat-label>
+
+      <mat-select [(ngModel)]="wizard.pvcName">
+
+        <mat-option
+          *ngFor="let pvc of pvcs"
+          [value]="pvc.name">
+
+          {{ pvc.name }} ({{ pvc.capacity }})
+
+
+
+        </mat-option>
+
+      </mat-select>
+
+    </mat-form-field>
+
+    <!-- DEBUG -->
+    <p>Selected PVC: {{ wizard.pvcName }}</p>
+
+    <mat-form-field appearance="outline" style="width:100%">
+
+      <mat-label>Mount Path</mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="wizard.mountPath">
+
+    </mat-form-field>
+
+  </div>
+  <!--Step 3-->
+  <div *ngIf="currentStep === 3">
+
+    <h2>Step 3 - Resources</h2>
+
+    <mat-form-field appearance="outline" style="width:100%">
+      <mat-label>CPU</mat-label>
+
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="wizard.cpu">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" style="width:100%">
+      <mat-label>Memory</mat-label>
+
+      <input
+        matInput
+        [(ngModel)]="wizard.memory">
+    </mat-form-field>
+
+    <mat-slide-toggle
+      color="primary"
+      [(ngModel)]="wizard.gpuEnabled">
+
+      Enable GPU
+
+    </mat-slide-toggle>
+
+    <div *ngIf="wizard.gpuEnabled">
+
+      <br><br>
+
+      <mat-form-field appearance="outline" style="width:100%">
+        <mat-label>GPU Model</mat-label>
+
+        <mat-select [(ngModel)]="wizard.gpuVendor">
+
+          <mat-option
+            *ngFor="let gpu of gpuModels"
+            [value]="gpu.value">
+
+            {{ gpu.displayName }}
+
+          </mat-option>
+
+        </mat-select>
+
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" style="width:100%">
+        <mat-label>GPU Count</mat-label>
+
+        <mat-select [(ngModel)]="wizard.gpuCount">
+
+          <mat-option
+            *ngFor="let count of gpuCounts"
+            [value]="count">
+
+            {{ count }}
+
+          </mat-option>
+
+        </mat-select>
+
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" style="width:100%">
+        <mat-label>GPU Core %</mat-label>
+
+        <input
+          matInput
+          type="number"
+          min="0"
+          max="100"
+          [(ngModel)]="wizard.gpuCore">
+
+        <mat-hint> Leave blank or 0 for a full GPU</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" style="width:100%">
+        <mat-label>GPU Memory (MB)</mat-label>
+
+        <input
+          matInput
+          type="number"
+          min="0"
+          [(ngModel)]="wizard.gpuMemory">
+
+        <mat-hint> Leave blank or 0 for a full GPU</mat-hint>
+      </mat-form-field>
+
+    </div>
+
+  </div>
+  <!--Step 3 End-->
+
+  <!--Step 4-->
+  <div *ngIf="currentStep === 4">
+
+    <h2>Step 4 - Advanced Runtime Configuration</h2>
+
+    <h3>Ports</h3>
+
+    <div *ngFor="let port of wizard.ports; let i = index">
+
+      <mat-form-field appearance="outline" style="width:100%">
+        <mat-label>Port Name</mat-label>
+
+        <input
+          matInput
+          [(ngModel)]="port.name">
+
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Container Port</mat-label>
+
+        <input
+          matInput
+          type="number"
+          [(ngModel)]="port.containerPort">
+
+      </mat-form-field>
+
+      <button
+        mat-button
+        color="warn"
+        (click)="removePort(i)">
+
+        Remove
+
+      </button>
+
+    </div>
+
+    <button
+      mat-stroked-button
+      color="primary"
+      (click)="addPort()">
+
+      Add Port
+
+    </button>
+
+    <br><br>
+
+    <mat-form-field
+      appearance="outline"
+      style="width:100%">
+
+      <mat-label>Startup Command</mat-label>
+
+      <textarea
+        matInput
+        rows="10"
+        [(ngModel)]="wizard.command">
+      </textarea>
+
+    </mat-form-field>
+
+  </div>
+  <!--Step 5-->
+  <div *ngIf="currentStep === 5">
+
+    <h2>Step 5 - Review</h2>
+
+    <h3>Basic Information</h3>
+
+    <p><strong>Name:</strong> {{ wizard.deploymentName }}</p>
+    <p><strong>Namespace:</strong> {{ wizard.namespace }}</p>
+    <p><strong>Runtime:</strong> {{ wizard.runtime }}</p>
+    <p><strong>Runtime Image:</strong> {{ wizard.runtimeImage }}</p>
+    <p><strong>Service Account:</strong> {{ wizard.serviceAccount }}</p>
+
+    <h3>Storage</h3>
+
+    <p><strong>PVC:</strong> {{ wizard.pvcName }}</p>
+    <p><strong>Mount Path:</strong> {{ wizard.mountPath }}</p>
+
+    <h3>Resources</h3>
+
+    <p><strong>CPU:</strong> {{ wizard.cpu }}</p>
+    <p><strong>Memory:</strong> {{ wizard.memory }}</p>
+
+    <p><strong>GPU Enabled:</strong> {{ wizard.gpuEnabled }}</p>
+
+    <div *ngIf="wizard.gpuEnabled">
+
+      <p><strong>GPU Model:</strong> {{ wizard.gpuVendor }}</p>
+      <p><strong>GPU Count:</strong> {{ wizard.gpuCount }}</p>
+      <p><strong>GPU Core %:</strong> {{ wizard.gpuCore }}</p>
+      <p><strong>GPU Memory:</strong> {{ wizard.gpuMemory }}</p>
+
+    </div>
+
+    <h3>Ports</h3>
+
+    <ul>
+      <li *ngFor="let port of wizard.ports">
+        {{ port.name }} : {{ port.containerPort }}
+      </li>
+    </ul>
+
+    <h3>Startup Command</h3>
+
+    <pre>{{ wizard.command }}</pre>
+
+  </div>
+
+  <div style="margin-top:20px">
+
+    <button
+      mat-button
+      *ngIf="currentStep > 1" 
+      (click)="previousStep()">
+      Back
+    </button>
+
+    <button
+      *ngIf="currentStep < 5"
+      mat-raised-button
+      color="primary"
+      [disabled]="!wizard.deploymentName"
+      (click)="nextStep()">
+      Next
+    </button>
+
+    <button
+      *ngIf="currentStep === 5"
+      mat-raised-button
+      color="primary"
+      (click)="createDeployment()">
+
+      Create Endpoint
+
+    </button>
+
+  </div>
+
+</div>

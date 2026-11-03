@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+
+h2 {
+  margin-bottom: 8px;
+  color: #0f3d6e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+input,
+select,
+textarea {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+
+  box-sizing: border-box;
+}
+
+.intro {
+  margin-bottom: 24px;
+  color: #526575;
+}
+
+.info-box {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+
+  background: #eef6ff;
+  border-left: 4px solid #287ad3;
+  border-radius: 4px;
+
+  color: #0f3d6e;
+}
+
+.info-box p {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
+.field {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}

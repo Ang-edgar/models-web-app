@@ -53,7 +53,7 @@ export class IndexComponent implements OnInit, OnDestroy {
     icon: 'add',
     stroked: true,
     fn: () => {
-      this.router.navigate(['/new']);
+      this.router.navigate(['/kserve-wizard'],);
     },
   });
 

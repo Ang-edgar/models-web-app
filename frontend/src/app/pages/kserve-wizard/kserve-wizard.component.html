@@ -1,0 +1,170 @@
+<div class="wizard-layout">
+  <main class="content">
+    <div class="panel">
+
+      <app-basic-info
+        *ngIf="currentStep === 1"
+        [wizard]="wizard">
+      </app-basic-info>
+
+      <app-serving-runtime
+        *ngIf="currentStep === 2"
+        [wizard]="wizard">
+      </app-serving-runtime>
+
+      <app-model-source
+        *ngIf="currentStep === 3"
+        [wizard]="wizard"
+        [pvcs]="pvcs">
+      </app-model-source>
+
+      <app-resources
+        *ngIf="currentStep === 4"
+        [wizard]="wizard">
+      </app-resources>
+
+      <app-container-config
+        *ngIf="currentStep === 5"
+        [wizard]="wizard">
+      </app-container-config>
+
+      <app-review
+        *ngIf="currentStep === 6"
+        [wizard]="wizard">
+      </app-review>
+
+      <!-- Later -->
+      <!--
+      <app-model-source
+        *ngIf="currentStep === 2">
+      </app-model-source>
+
+      <app-serving-runtime
+        *ngIf="currentStep === 3">
+      </app-serving-runtime>
+
+      <app-resources
+        *ngIf="currentStep === 4">
+      </app-resources>
+
+      <app-networking
+        *ngIf="currentStep === 5">
+      </app-networking>
+
+      <app-review
+        *ngIf="currentStep === 6">
+      </app-review>
+      -->
+
+    </div>
+  </main>
+
+  <aside class="sidebar">
+
+    <h1>KServe Wizard</h1>
+
+    <div class="step"
+        [class.active]="currentStep === 1"
+        [class.completed]="currentStep > 1">
+
+      <div class="step-icon">
+        <span *ngIf="currentStep <= 1">1</span>
+        <span *ngIf="currentStep > 1">✓</span>
+      </div>
+
+      <span class="step-label">Basic Info</span>
+    </div>
+
+    <div class="step"
+        [class.active]="currentStep === 2"
+        [class.completed]="currentStep > 2">
+
+      <div class="step-icon">
+        <span *ngIf="currentStep <= 2">2</span>
+        <span *ngIf="currentStep > 2">✓</span>
+      </div>
+
+      <span class="step-label">Serving Runtime</span>
+    </div>
+
+    <div class="step"
+        [class.active]="currentStep === 3"
+        [class.completed]="currentStep > 3">
+
+      <div class="step-icon">
+        <span *ngIf="currentStep <= 3">3</span>
+        <span *ngIf="currentStep > 3">✓</span>
+      </div>
+
+      <span class="step-label">Model Source</span>
+    </div>
+
+    <div class="step"
+        [class.active]="currentStep === 4"
+        [class.completed]="currentStep > 4">
+
+      <div class="step-icon">
+        <span *ngIf="currentStep <= 4">4</span>
+        <span *ngIf="currentStep > 4">✓</span>
+      </div>
+
+      <span class="step-label">Resources</span>
+    </div>
+
+    <div class="step"
+        [class.active]="currentStep === 5"
+        [class.completed]="currentStep > 5">
+
+      <div class="step-icon">
+        <span *ngIf="currentStep <= 5">5</span>
+        <span *ngIf="currentStep > 5">✓</span>
+      </div>
+
+      <span class="step-label">Container Configuration</span>
+    </div>
+
+    <div class="step"
+        [class.active]="currentStep === 6">
+
+      <div class="step-icon">
+        6
+      </div>
+
+      <span class="step-label">Review & Create</span>
+    </div>
+
+  </aside>
+
+</div>
+
+<div class="footer-nav">
+  <div class="footer-left">
+    <button
+      *ngIf="currentStep === 1"
+      (click)="cancel()">
+      Cancel
+    </button>
+
+    <button
+      (click)="previousStep()"
+      [disabled]="currentStep === 1">
+      Previous
+    </button>
+  </div>
+
+  <div class="footer-right">
+    <button
+      *ngIf="currentStep < 6"
+      (click)="nextStep()">
+      Next
+    </button>
+
+    <button
+      class="create-btn"
+      *ngIf="currentStep === 6"
+      (click)="createDeployment()">
+      Create Endpoint
+    </button>
+  </div>
+
+</div>

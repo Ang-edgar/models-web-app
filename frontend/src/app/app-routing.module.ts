@@ -8,11 +8,13 @@ import { LLMInferenceServiceComponent } from './pages/llm-inference-service/llm-
 import { LLMDetailsComponent } from './pages/llm-inference-service/llm-details/llm-details.component';
 import { GraphFormComponent } from './pages/inference-graph/graph-form/graph-form.component';
 import { GraphInfoComponent } from './pages/inference-graph/graph-info/graph-info.component';
+import { KServeWizardComponent } from './pages/kserve-wizard/kserve-wizard.component';
 
 const routes: Routes = [
   { path: '', component: IndexComponent },
   { path: 'details/:namespace/:name', component: ServerInfoComponent },
   { path: 'new', component: SubmitFormComponent },
+  { path: 'kserve-wizard', component: KServeWizardComponent },
   { path: 'inference-graphs', component: InferenceGraphComponent },
   { path: 'llm-inference-services', component: LLMInferenceServiceComponent },
   { path: 'llm-details/:namespace/:name', component: LLMDetailsComponent },

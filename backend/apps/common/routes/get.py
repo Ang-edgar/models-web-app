@@ -2,6 +2,7 @@
 
 from flask import request
 from kubernetes.client.rest import ApiException
+from kubernetes import client
 
 from kubeflow.kubeflow.crud_backend import api, logging
 
@@ -188,6 +189,36 @@ def get_inference_graph_events(namespace, name):
         api.serialize(events),
     )
 
+@bp.route("/api/namespaces/<namespace>/pvcs")
+def get_pvcs(namespace):
+    """Return PVCs in the namespace."""
+
+    v1 = client.CoreV1Api()
+
+    pvcs = v1.list_namespaced_persistent_volume_claim(
+        namespace=namespace
+    ).items
+
+    pvc_list = []
+
+    for pvc in pvcs:
+        pvc_list.append(
+            {
+                "name": pvc.metadata.name,
+                "capacity": (
+                    pvc.status.capacity.get("storage")
+                    if pvc.status and pvc.status.capacity
+                    else ""
+                ),
+                "status": (
+                    pvc.status.phase
+                    if pvc.status
+                    else "Unknown"
+                ),
+            }
+        )
+
+    return api.success_response("pvcs", pvc_list)
 
 # The API server may serve either LLMInferenceService version. The first
 # request probes for the served version; every later request reuses the

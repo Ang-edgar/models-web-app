@@ -14,7 +14,7 @@
   {{ container.image }}
 </lib-details-list-item>
 
-<lib-details-list-item *ngIf="container.image" key="Command">
+<lib-details-list-item *ngIf="cmd" key="Command">
   {{ cmd }}
 </lib-details-list-item>
 
@@ -47,4 +47,25 @@
   key="Memory requests"
 >
   {{ container.resources.requests.memory }}
+</lib-details-list-item>
+
+<lib-details-list-item
+  *ngIf="container.resources?.limits?.['nvidia.com/gpu']"
+  key="GPU Count"
+>
+  {{ container.resources.limits['nvidia.com/gpu'] }}
+</lib-details-list-item>
+
+<lib-details-list-item
+  *ngIf="portsText"
+  key="Ports"
+>
+  {{ portsText }}
+</lib-details-list-item>
+
+<lib-details-list-item
+  *ngIf="mountPaths"
+  key="Volume Mounts"
+>
+  {{ mountPaths }}
 </lib-details-list-item>

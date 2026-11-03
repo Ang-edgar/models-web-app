@@ -1,0 +1,146 @@
+<h2>Review &amp; Create</h2>
+
+<p class="intro">
+  Review the generated InferenceService before deployment.
+</p>
+
+<div class="summary-grid">
+
+  <div class="summary-section">
+    <h3>Basic Information</h3>
+
+    <div class="summary-row">
+      <span>Name</span>
+      <strong>{{ wizard.deploymentName || '-' }}</strong>
+    </div>
+
+    <div class="summary-row">
+      <span>Namespace</span>
+      <strong>{{ wizard.namespace || '-' }}</strong>
+    </div>
+
+    <div class="summary-row">
+      <span>Deployment Mode</span>
+      <strong>{{ wizard.deploymentMode || 'Standard' }}</strong>
+    </div>
+  </div>
+
+  <div class="summary-section">
+    <h3>Serving Runtime</h3>
+
+    <div class="summary-row">
+      <span>Runtime</span>
+      <strong>{{ wizard.runtime }}</strong>
+    </div>
+
+    <div class="summary-row">
+      <span>Runtime Image</span>
+      <strong>{{ wizard.runtimeImage || '-' }}</strong>
+    </div>
+
+    <div class="summary-row">
+      <span>Service Account</span>
+      <strong>{{ wizard.serviceAccount }}</strong>
+    </div>
+  </div>
+
+  <div class="summary-section" *ngIf="wizard.pvcName">
+    <h3>Model Source</h3>
+
+    <div class="summary-row">
+      <span>PVC</span>
+      <strong>{{ wizard.pvcName }}</strong>
+    </div>
+
+    <div class="summary-row">
+      <span>Mount Path</span>
+      <strong>{{ wizard.mountPath }}</strong>
+    </div>
+  </div>
+
+  <div class="summary-section">
+    <h3>Resources</h3>
+
+    <div class="summary-row">
+      <span>CPU Request</span>
+      <strong>{{ wizard.cpuRequest }}</strong>
+    </div>
+
+    <div class="summary-row">
+      <span>CPU Limit</span>
+      <strong>{{ wizard.cpuLimit }}</strong>
+    </div>
+
+    <div class="summary-row">
+      <span>Memory Request</span>
+      <strong>{{ wizard.memoryRequest }}{{ wizard.memoryRequestUnit }}</strong>
+    </div>
+
+    <div class="summary-row">
+      <span>Memory Limit</span>
+      <strong>{{ wizard.memoryLimit }}{{ wizard.memoryLimitUnit }}</strong>
+    </div>
+
+    <div class="summary-row" *ngIf="wizard.gpuEnabled">
+      <span>GPU</span>
+      <strong>{{ wizard.gpuCount }} × {{ wizard.gpuVendor }}</strong>
+    </div>
+
+    <div class="summary-row" *ngIf="wizard.gpuCore">
+      <span>GPU Core</span>
+      <strong>{{ wizard.gpuCore }}%</strong>
+    </div>
+
+    <div class="summary-row" *ngIf="wizard.gpuMemory">
+      <span>GPU Memory</span>
+      <strong>{{ wizard.gpuMemory }} MB</strong>
+    </div>
+
+  </div>
+
+  <div class="summary-section">
+    <h3>Container Configuration</h3>
+
+    <div
+      class="summary-row"
+      *ngFor="let port of wizard.ports">
+
+      <span>{{ port.name }}</span>
+      <strong>{{ port.containerPort }}</strong>
+
+    </div>
+
+    <div
+      class="summary-row"
+      *ngIf="wizard.command">
+
+      <span>Startup Script</span>
+      <strong>Configured</strong>
+
+    </div>
+
+  </div>
+
+</div>
+
+<div class="field">
+
+  <label>Generated YAML</label>
+
+  <textarea
+    readonly
+    rows="20">{{ generatedYaml }}</textarea>
+
+</div>
+
+<div class="actions">
+
+  <button
+    type="button"
+    (click)="copyYaml()">
+
+    Copy YAML
+
+  </button>
+
+</div>

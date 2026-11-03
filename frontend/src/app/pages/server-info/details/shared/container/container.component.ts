@@ -9,6 +9,8 @@ import { ListEntry, ChipDescriptor } from 'kubeflow';
 export class ContainerComponent {
   public cmd: string;
   public env: ChipDescriptor[];
+  public portsText: string;
+  public mountPaths: string;
 
   @Input()
   set container(c: V1Container) {
@@ -16,6 +18,8 @@ export class ContainerComponent {
 
     this.env = this.generateEnv(c);
     this.cmd = this.generateCmd(c);
+    this.portsText = this.generatePorts(c);
+    this.mountPaths = this.generateMountPaths(c);
   }
   get container() {
     return this.containerPrv;
@@ -52,5 +56,25 @@ export class ContainerComponent {
 
     cmd += [cmd, ...c.args].join(' ');
     return cmd;
+  }
+
+  private generatePorts(c: V1Container): string {
+    if (!c.ports?.length) {
+      return null;
+    }
+
+    return c.ports
+      .map(p => `${p.name}: ${p.containerPort}`)
+      .join(', ');
+  }
+
+  private generateMountPaths(c: V1Container): string {
+    if (!c.volumeMounts?.length) {
+      return null;
+    }
+
+    return c.volumeMounts
+      .map(v => `${v.name}: ${v.mountPath}`)
+      .join(', ');
   }
 }

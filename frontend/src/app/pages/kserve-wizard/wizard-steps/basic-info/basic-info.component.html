@@ -1,0 +1,46 @@
+<h2>Basic Info</h2>
+
+<p class="intro">
+  Name your InferenceService and choose its Kubernetes namespace.
+</p>
+
+<div class="field">
+  <label>InferenceService Name</label>
+
+  <input
+    [(ngModel)]="wizard.deploymentName"
+    placeholder="llama3-chat"
+    required
+  />
+  <div
+    class="error"
+    *ngIf="!wizard.deploymentName?.trim()">
+
+    InferenceService Name is required.
+
+  </div>
+</div>
+
+<div class="field">
+  <label>Namespace</label>
+
+  <input
+    type="text"
+    [(ngModel)]="wizard.namespace"
+    readonly
+    class="readonly-field"
+  />
+</div>
+
+<div class="field">
+  <label>Deployment Mode</label>
+
+  <select [(ngModel)]="wizard.deploymentMode">
+    <option value="Standard">Standard</option>
+    <option value="RawDeployment">Raw Deployment</option>
+  </select>
+
+  <small class="help-text">
+    Standard uses Knative. Raw Deployment creates a Kubernetes Deployment directly.
+  </small>
+</div>

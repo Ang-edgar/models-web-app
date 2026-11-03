@@ -1,0 +1,57 @@
+
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: gemma-4-12b-it
+  namespace: sm-ibdi
+spec:
+  predictor:
+    serviceAccountName: default
+    volumes:
+    - name: gemma-cache
+      persistentVolumeClaim:
+        claimName: gemma-cache
+    containers:
+    - name: kserve-container
+      image: utcsyquay.unimicron.com/kserve/vllm-openai:v0.24.0-metrics
+      ports:
+      - name: http1
+        containerPort: 8080
+      - name: metrics
+        containerPort: 8001
+      command:
+      - sh
+      - -c
+      - |
+        python3 /opt/gpu_metrics.py &
+        exec python3 -m vllm.entrypoints.openai.api_server \
+          --model /mnt/models \
+          --served-model-name gemma-4-12b-it \
+          --host 0.0.0.0 \
+          --port 8080 \
+          --gpu-memory-utilization 0.9 \
+          --tensor-parallel-size 2 \
+          --max-num-batched-tokens 16384 \
+          --max-model-len 32768 \
+          --max-num-seqs 5 \
+          --enable-auto-tool-choice \
+          --tool-call-parser gemma4 \
+          --mm-processor-cache-type lru \
+          --disable-custom-all-reduce \
+          --reasoning-parser gemma4 \
+          --no-scheduler-reserve-full-isl
+      resources:
+        limits:
+          cpu: "16"
+          memory: 96Gi
+          nvidia.com/gpu: "2"
+      volumeMounts:
+      - name: gemma-cache
+        mountPath: /mnt/models
+    nodeSelector:
+      gpu-model: L40s
+    tolerations:
+    - key: nvidia.com/gpu
+      operator: Equal
+      value: present
+      effect: NoSchedule

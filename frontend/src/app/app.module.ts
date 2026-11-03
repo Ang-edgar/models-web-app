@@ -17,6 +17,7 @@ import {
 import { ConfigService } from './services/config.service';
 import { take, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { KServeWizardModule } from './pages/kserve-wizard/kserve-wizard.module';
 
 /**
  * MAT_SNACK_BAR_DEFAULT_OPTIONS values can be found
@@ -38,6 +39,7 @@ const MwaSnackBarConfig: MatSnackBarConfig = {
     SubmitFormModule,
     InferenceGraphModule,
     LLMInferenceServiceModule,
+    KServeWizardModule,
   ],
   providers: [
     { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: MwaSnackBarConfig },

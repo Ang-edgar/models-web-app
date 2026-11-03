@@ -13,6 +13,7 @@ import {
   StandardDeploymentObjects,
 } from '../types/backend';
 import { EventObject } from '../types/event';
+import { PVCResponseObject } from '../types/pvc';
 
 @Injectable({
   providedIn: 'root',
@@ -296,6 +297,15 @@ export class MWABackendService extends BackendService {
     return this.http.get<MWABackendResponse>(url).pipe(
       catchError(error => this.handleError(error, false)),
       map((resp: MWABackendResponse) => resp.events),
+    );
+  }
+
+  public getPVCs(namespace: string): Observable<PVCResponseObject[]> {
+    const url = `api/namespaces/${namespace}/pvcs`;
+
+    return this.http.get<any>(url).pipe(
+      catchError(error => this.handleError(error)),
+      map(resp => resp.pvcs),
     );
   }
 

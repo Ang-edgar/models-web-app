@@ -1,0 +1,63 @@
+<h2>Container Configuration</h2>
+
+<p class="intro">
+  Configure container ports and startup commands.
+</p>
+
+<div class="field">
+
+  <label>Ports</label>
+
+  <div
+    class="port-row"
+    *ngFor="let port of wizard.ports; let i = index">
+
+    <input
+      [(ngModel)]="port.name"
+      placeholder="http1" />
+
+    <input
+      type="number"
+      [(ngModel)]="port.containerPort"
+      placeholder="8080" />
+
+    <button
+      type="button"
+      class="remove-btn"
+      (click)="removePort(i)"
+      *ngIf="wizard.ports.length > 1">
+
+      Remove
+
+    </button>
+
+  </div>
+
+  <button
+    type="button"
+    class="add-btn"
+    (click)="addPort()">
+
+    Add Port
+
+  </button>
+
+</div>
+
+<div class="field">
+
+  <label>Startup Script (Optional)</label>
+
+  <div
+    #editor
+    class="command-editor">
+  </div>
+</div>
+
+<div class="info-box">
+
+  Enter the container startup script or command.
+  This will be rendered into the container command section
+  of the generated InferenceService manifest.
+
+</div>

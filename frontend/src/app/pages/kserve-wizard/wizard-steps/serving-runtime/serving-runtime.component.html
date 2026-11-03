@@ -1,0 +1,59 @@
+<h2>Serving Runtime</h2>
+
+<p class="intro">
+  Choose the runtime that will serve your model.
+</p>
+
+<div class="field">
+  <label>Runtime</label>
+
+  <select [(ngModel)]="wizard.runtime">
+    <option value="custom">Custom Runtime</option>
+    <option value="vllm">vLLM</option>
+    <option value="triton">Triton Inference Server</option>
+    <option value="torchserve">TorchServe</option>
+    <option value="ovms">OpenVINO Model Server</option>
+    
+  </select>
+</div>
+
+<div class="field">
+  <label>Service Account</label>
+
+  <input
+    [(ngModel)]="wizard.serviceAccount"
+    placeholder="default"
+  />
+</div>
+
+<div class="field">
+  <label>
+    Runtime Image
+    <span *ngIf="wizard.runtime === 'custom'" class="required">
+      *
+    </span>
+  </label>
+
+<div
+  class="runtime-hint"
+  *ngIf="wizard.runtime === 'custom'">
+
+  Custom Runtime requires a container image.
+</div>
+
+  <input
+    [(ngModel)]="wizard.runtimeImage"
+    placeholder="utcsyquay.unimicron.com/runtime:tag"
+    [required]="wizard.runtime === 'custom'"
+  />
+</div>
+
+<div class="field">
+  <label>Description (Optional)</label>
+
+  <textarea
+    [(ngModel)]="wizard.description"
+    rows="4"
+    placeholder="Describe this endpoint">
+  </textarea>
+</div>

@@ -34,6 +34,13 @@
   {{ predictorSpec.pytorch.modelClassName }}
 </lib-details-list-item>
 
+<lib-details-list-item
+  *ngIf="predictorSpec?.volumes?.length"
+  key="PVC"
+>
+  {{ predictorSpec.volumes[0]?.persistentVolumeClaim?.claimName }}
+</lib-details-list-item>
+
 <!--Pod Spec-->
 <app-pod-details [pod]="predictorSpec"></app-pod-details>
 
