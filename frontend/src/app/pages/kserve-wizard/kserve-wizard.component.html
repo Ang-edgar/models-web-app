@@ -2,12 +2,30 @@
   <main class="content">
     <div class="panel">
 
-      <textarea
-        *ngIf="advancedMode"
-        [(ngModel)]="yamlData"
-        rows="30"
-        style="width:100%; font-family:monospace;">
-      </textarea>
+      <div *ngIf="advancedMode">
+
+        <h2>Advanced Mode</h2>
+
+        <p class="intro">
+          Directly edit the generated InferenceService YAML.
+        </p>
+
+        <div
+          #yamlEditor
+          class="yaml-editor">
+        </div>
+
+        <div class="info-box">
+
+          Changes made here will be applied directly to the
+          generated InferenceService manifest.
+
+          Switching back to Wizard Mode may fail if the YAML
+          contains unsupported customizations.
+
+        </div>
+
+      </div>
 
       <ng-container *ngIf="!advancedMode">
 

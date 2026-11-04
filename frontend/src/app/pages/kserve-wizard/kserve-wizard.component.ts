@@ -1,16 +1,71 @@
-import { Component, OnInit } from '@angular/core';
 import { MWABackendService } from '../../services/backend.service';
 import { PVCResponseObject } from '../../types/pvc';
 import { NamespaceService } from 'kubeflow';
 import { Router } from '@angular/router';
 import { dump, load } from 'js-yaml';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core';
+
+import * as ace from 'ace-builds';
+
+import 'ace-builds/src-noconflict/mode-yaml';
+import 'ace-builds/src-noconflict/theme-xcode';
 
 @Component({
   selector: 'app-kserve-wizard',
   templateUrl: './kserve-wizard.component.html',
   styleUrls: ['./kserve-wizard.component.scss'],
 })
-export class KServeWizardComponent implements OnInit{
+export class KServeWizardComponent implements OnInit, OnDestroy{
+
+  @ViewChild('yamlEditor')
+  yamlEditor?: ElementRef;
+
+  private aceYamlEditor?: ace.Ace.Editor;
+
+  private initYamlEditor() {
+
+    if (!this.yamlEditor) {
+      return;
+    }
+
+    if (this.aceYamlEditor) {
+      return;
+    }
+
+    this.aceYamlEditor = ace.edit(
+      this.yamlEditor.nativeElement,
+      {
+        mode: 'ace/mode/yaml',
+        theme: 'ace/theme/xcode',
+        tabSize: 2,
+        wrap: true,
+      },
+    );
+
+    this.aceYamlEditor.setValue(
+      this.yamlData || '',
+      -1,
+    );
+
+    this.aceYamlEditor.on('change', () => {
+      this.yamlData =
+        this.aceYamlEditor?.getValue() || '';
+    });
+  }
+
+  ngOnDestroy() {
+
+    if (this.aceYamlEditor) {
+      this.aceYamlEditor.destroy();
+    }
+
+  }
   currentStep = 1;
 
   advancedMode = false;
@@ -413,25 +468,46 @@ export class KServeWizardComponent implements OnInit{
   }
 
   toggleAdvancedMode(enabled: boolean) {
-    if (enabled) {
-      this.yamlData = dump(this.buildInferenceService());
-    }
 
-    if (!enabled) {
-      try {
-        const cr = load(this.yamlData);
-        this.populateWizardFromYaml(cr);
-      } catch (e) {
-        alert(
-          'Unable to convert YAML back into Wizard mode.',
+    if (enabled) {
+
+      this.yamlData =
+        dump(this.buildInferenceService());
+
+      this.advancedMode = true;
+
+      setTimeout(() => {
+
+        this.initYamlEditor();
+
+        this.aceYamlEditor?.setValue(
+          this.yamlData,
+          -1,
         );
 
-        this.advancedMode = true;
-        return;
-      }
+      });
+
+      return;
     }
 
-    this.advancedMode = enabled;
+    try {
+
+      const cr = load(this.yamlData);
+
+      this.populateWizardFromYaml(cr);
+
+    } catch (e) {
+
+      alert(
+        'Unable to convert YAML back into Wizard mode.',
+      );
+
+      this.advancedMode = true;
+
+      return;
+    }
+
+    this.advancedMode = false;
   }
 
   createDeployment() {
@@ -485,3 +561,4 @@ export class KServeWizardComponent implements OnInit{
     
   }
 }
+
