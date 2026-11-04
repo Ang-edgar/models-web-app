@@ -5,50 +5,228 @@
 </p>
 
 <div class="field">
+
   <label>Runtime</label>
 
   <select [(ngModel)]="wizard.runtime">
-    <option value="custom">Custom Runtime</option>
-    <option value="vllm">vLLM</option>
-    <option value="triton">Triton Inference Server</option>
-    <option value="torchserve">TorchServe</option>
-    <option value="ovms">OpenVINO Model Server</option>
-    
+
+    <option value="vLLM">vLLM</option>
+
+    <option value="huggingface">HuggingFace</option>
+
+    <option value="tensorflow">TensorFlow</option>
+
+    <option value="pytorch">PyTorch</option>
+
+    <option value="tensorrt">TensorRT</option>
+
+    <option value="sklearn">Scikit-Learn</option>
+
+    <option value="xgboost">XGBoost</option>
+
+    <option value="lightgbm">LightGBM</option>
+
+    <option value="autogluon">AutoGluon</option>
+
+    <option value="paddle">Paddle</option>
+
+    <option value="pmml">PMML</option>
+
+    <option value="custom">
+      Custom Runtime
+    </option>
+
   </select>
+
+</div>
+
+<!-- Built-in Runtime -->
+
+<div
+  class="field"
+  *ngIf="wizard.runtime !== 'custom'">
+
+  <!-- vLLM -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'vLLM'">
+
+    <strong>vLLM</strong><br>
+
+    Optimized for Large Language Models such as Llama,
+    Gemma, Qwen and Mistral.
+
+    <ul>
+      <li>OpenAI-compatible APIs</li>
+      <li>Continuous batching</li>
+      <li>Optimized GPU utilization</li>
+      <li>High-throughput inference</li>
+    </ul>
+
+  </div>
+
+  <!-- HuggingFace -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'huggingface'">
+
+    <strong>HuggingFace</strong><br>
+
+    General-purpose runtime for HuggingFace models.
+
+    <ul>
+      <li>Embeddings</li>
+      <li>Text generation</li>
+      <li>Text classification</li>
+      <li>Transformer-based models</li>
+    </ul>
+
+  </div>
+
+  <!-- TensorFlow -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'tensorflow'">
+
+    <strong>TensorFlow</strong><br>
+
+    Serve TensorFlow SavedModel workloads.
+
+  </div>
+
+  <!-- PyTorch -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'pytorch'">
+
+    <strong>PyTorch</strong><br>
+
+    Serve TorchScript and PyTorch models.
+
+  </div>
+
+  <!-- TensorRT -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'tensorrt'">
+
+    <strong>TensorRT</strong><br>
+
+    High-performance NVIDIA GPU inference.
+
+  </div>
+
+  <!-- Scikit-Learn -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'sklearn'">
+
+    <strong>Scikit-Learn</strong><br>
+
+    Traditional machine learning models.
+
+  </div>
+
+  <!-- XGBoost -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'xgboost'">
+
+    <strong>XGBoost</strong><br>
+
+    Gradient boosting decision tree models.
+
+  </div>
+
+  <!-- LightGBM -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'lightgbm'">
+
+    <strong>LightGBM</strong><br>
+
+    Fast gradient boosting framework.
+
+  </div>
+
+  <!-- AutoGluon -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'autogluon'">
+
+    <strong>AutoGluon</strong><br>
+
+    AutoML models trained with AutoGluon.
+
+  </div>
+
+  <!-- Paddle -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'paddle'">
+
+    <strong>Paddle</strong><br>
+
+    PaddlePaddle deep learning models.
+
+  </div>
+
+  <!-- PMML -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'pmml'">
+
+    <strong>PMML</strong><br>
+
+    Predictive Model Markup Language models.
+
+  </div>
+
+</div>
+
+<!-- Custom Runtime -->
+
+<div
+  *ngIf="wizard.runtime === 'custom'">
+
+  <label>
+    Runtime Image
+    <span class="required">*</span>
+  </label>
+
+  <div class="runtime-hint">
+    Custom Runtime requires a container image.
+  </div>
+
+  <input
+    [(ngModel)]="wizard.runtimeImage"
+    placeholder="utcsyquay.unimicron.com/runtime:tag">
+
 </div>
 
 <div class="field">
+
   <label>Service Account</label>
 
   <input
     [(ngModel)]="wizard.serviceAccount"
-    placeholder="default"
-  />
+    placeholder="default">
+
 </div>
 
 <div class="field">
-  <label>
-    Runtime Image
-    <span *ngIf="wizard.runtime === 'custom'" class="required">
-      *
-    </span>
-  </label>
 
-<div
-  class="runtime-hint"
-  *ngIf="wizard.runtime === 'custom'">
-
-  Custom Runtime requires a container image.
-</div>
-
-  <input
-    [(ngModel)]="wizard.runtimeImage"
-    placeholder="utcsyquay.unimicron.com/runtime:tag"
-    [required]="wizard.runtime === 'custom'"
-  />
-</div>
-
-<div class="field">
   <label>Description (Optional)</label>
 
   <textarea
@@ -56,4 +234,5 @@
     rows="4"
     placeholder="Describe this endpoint">
   </textarea>
+
 </div>

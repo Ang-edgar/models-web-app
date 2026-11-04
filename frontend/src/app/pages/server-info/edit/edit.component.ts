@@ -171,7 +171,9 @@ export class EditComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    cr.metadata.resourceVersion = this.resourceVersion;
+    cr.metadata = cr.metadata || {};
+    delete cr.metadata.resourceVersion;
+    // cr.metadata.resourceVersion = this.resourceVersion;
     cr.metadata.name = this.originalName;
     cr.metadata.namespace = this.originalNamespace;
 
@@ -191,11 +193,13 @@ export class EditComponent implements OnInit, AfterViewInit, OnDestroy {
         },
         error: err => {
           console.error('Error updating InferenceService:', err);
+          console.error('Response:', err.error);
+          console.error('Status:', err.status);
           this.applying = false;
           this.snack.open({
             data: {
               msg: `Failed to update InferenceService: ${
-                err.message || 'Unknown error'
+                err?.error?.log || err?.message || 'Unknown error'
               }`,
               snackType: SnackType.Error,
             },

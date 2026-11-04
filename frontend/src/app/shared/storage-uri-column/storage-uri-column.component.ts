@@ -13,10 +13,21 @@ export class StorageUriColumnComponent
   extends StorageUriComponent
   implements TableColumnComponent
 {
+  public pvcName = '';
+
   set element(inferenceService: InferenceServiceK8s) {
     this.basePredictor = getPredictorExtensionSpec(
       inferenceService.spec.predictor,
     );
+
     this.namespace = inferenceService.metadata.namespace;
+
+    const pvc = inferenceService.spec?.predictor?.volumes?.find(
+      v => v.persistentVolumeClaim,
+    );
+
+    this.pvcName =
+      pvc?.persistentVolumeClaim?.claimName || '';
   }
 }
+

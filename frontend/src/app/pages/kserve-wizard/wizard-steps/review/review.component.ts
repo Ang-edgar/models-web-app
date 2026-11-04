@@ -18,54 +18,84 @@ export class ReviewComponent implements OnChanges {
 buildYaml(): void {
   const predictor: any = {
     serviceAccountName: this.wizard.serviceAccount,
-    containers: [
+  };
+
+  let container: any = null;
+
+  if (this.wizard.runtime === 'custom') {
+
+    predictor.containers = [
       {
         name: 'kserve-container',
         image: this.wizard.runtimeImage || '<runtime-image>',
       },
-    ],
-  };
-
-  const container = predictor.containers[0];
-
-  // Ports
-  if (this.wizard.ports?.length) {
-    container.ports = this.wizard.ports
-      .filter((p: any) => p.name && p.containerPort)
-      .map((p: any) => ({
-        containerPort: Number(p.containerPort),
-        name: p.name,
-        protocol: 'TCP',
-      }));
-  }
-
-  // Command
-  if (this.wizard.command?.trim()) {
-    container.command = [
-      'sh',
-      '-c',
-      this.wizard.command
-        .replace(/\r\n/g, '\n')
-        .trim(),
     ];
+
+    container = predictor.containers[0];
+
+  } else {
+
+    predictor.model = {
+      runtime: this.wizard.runtime,
+      modelFormat: {
+        name: this.wizard.runtime,
+      },
+      storageUri: `pvc://${this.wizard.pvcName}/${this.wizard.modelPath}`,
+
+      resources: {
+        requests: {
+          cpu: String(this.wizard.cpuRequest),
+          memory: `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
+        },
+
+        limits: {
+          cpu: String(this.wizard.cpuLimit),
+          memory: `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
+        },
+      },
+    };
+
   }
 
-  // Resources
-  container.resources = {
-    requests: {
-      cpu: String(this.wizard.cpuRequest),
-      memory: `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
-    },
-    limits: {
-      cpu: String(this.wizard.cpuLimit),
-      memory: `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
-    },
-  };
+  if (this.wizard.runtime === 'custom') {
+
+    // Ports
+    if (this.wizard.ports?.length) {
+      container.ports = this.wizard.ports
+        .filter((p: any) => p.name && p.containerPort)
+        .map((p: any) => ({
+          containerPort: Number(p.containerPort),
+          name: p.name,
+          protocol: 'TCP',
+        }));
+    }
+
+    // Command
+    if (this.wizard.command?.trim()) {
+      container.command = [
+        'sh',
+        '-c',
+        this.wizard.command
+          .replace(/\r\n/g, '\n')
+          .trim(),
+      ];
+    }
+  }
+
+    // Resources
+    container.resources = {
+      requests: {
+        cpu: String(this.wizard.cpuRequest),
+        memory: `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
+      },
+      limits: {
+        cpu: String(this.wizard.cpuLimit),
+        memory: `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
+      },
+    };
 
   // GPU
   if (this.wizard.gpuEnabled) {
-    container.resources.limits['nvidia.com/gpu'] =
-      String(this.wizard.gpuCount);
 
     predictor.nodeSelector = {
       'gpu-model': this.wizard.gpuModel,
@@ -79,13 +109,28 @@ buildYaml(): void {
         value: 'present',
       },
     ];
+
+    if (this.wizard.runtime === 'custom') {
+
+      container.resources.limits['nvidia.com/gpu'] =
+        String(this.wizard.gpuCount);
+
+    } else {
+
+      predictor.model.resources.limits['nvidia.com/gpu'] =
+        String(this.wizard.gpuCount);
+
+    }
   }
 
   // PVC
-  if (this.wizard.pvcName) {
+  if (
+    this.wizard.runtime === 'custom' &&
+    this.wizard.pvcName
+  ) {
     predictor.volumes = [
       {
-        name: this.wizard.pvcName,
+        name: 'model-storage',
         persistentVolumeClaim: {
           claimName: this.wizard.pvcName,
         },
@@ -94,8 +139,8 @@ buildYaml(): void {
 
     container.volumeMounts = [
       {
+        name: 'model-storage',
         mountPath: this.wizard.mountPath,
-        name: this.wizard.pvcName,
       },
     ];
   }

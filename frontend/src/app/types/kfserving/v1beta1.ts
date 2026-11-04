@@ -14,6 +14,8 @@ export interface InferenceServiceIR extends InferenceServiceK8s {
     runtimeVersion?: string;
     predictorType?: string;
     storageUri?: string;
+    lastEdited?: string;
+    gpu?: string;
     protocolVersion?: string;
     link?: {
       text: string;

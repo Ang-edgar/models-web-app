@@ -4,14 +4,15 @@
   Configure where the serving runtime loads the model from.
 </p>
 
-<div class="info-box">
+<div 
+  class="info-box"
+  *ngIf="wizard.runtime === 'custom'">
   <strong>Optional</strong>
 
   <p>
-    Skip this step if your serving runtime already contains the model
+    Skip this step if your serving runtime already contains the model.
   </p>
 </div>
-
 
 <div class="field">
 
@@ -35,12 +36,73 @@
 
 </div>
 
-<div class="field">
+<!-- Custom Runtime -->
 
-  <label>Mount Path</label>
+<ng-container *ngIf="wizard.runtime === 'custom'">
 
-  <input
-    [(ngModel)]="wizard.mountPath"
-    placeholder="/mnt/models">
+  <div class="field">
 
-</div>
+    <label>Mount Path</label>
+
+    <input
+      [(ngModel)]="wizard.mountPath"
+      placeholder="/mnt/models">
+
+  </div>
+
+</ng-container>
+
+<!-- Built-in Runtime -->
+
+<ng-container *ngIf="wizard.runtime !== 'custom'">
+
+  <div class="field">
+
+    <label>Path Inside PVC</label>
+
+    <input
+      [(ngModel)]="wizard.modelPath"
+      placeholder="models/llama3">
+
+    <div
+      class="info-box"
+      *ngIf="wizard.runtime !== 'custom'">
+
+      <strong>Model Path</strong>
+
+      <p>
+        Specify the path to the model directory inside the selected PVC.
+      </p>
+
+      <p>
+        Example:
+        <code>/models/llama3</code>
+      </p>
+
+      <p>
+        If PVC = <code>model-storage</code>
+        and path = <code>models/llama3</code>,
+        KServe will generate:
+      </p>
+
+      <code>
+        pvc://model-storage/models/llama3
+      </code>
+
+    </div>
+
+  </div>
+
+  <div
+    class="info-box"
+    *ngIf="wizard.pvcName && wizard.modelPath">
+
+    <strong>Generated Storage URI</strong>
+
+    <p>
+      pvc://{{ wizard.pvcName }}/{{ wizard.modelPath }}
+    </p>
+
+  </div>
+
+</ng-container>

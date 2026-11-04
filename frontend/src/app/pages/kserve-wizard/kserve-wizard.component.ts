@@ -3,6 +3,7 @@ import { MWABackendService } from '../../services/backend.service';
 import { PVCResponseObject } from '../../types/pvc';
 import { NamespaceService } from 'kubeflow';
 import { Router } from '@angular/router';
+import { dump, load } from 'js-yaml';
 
 @Component({
   selector: 'app-kserve-wizard',
@@ -11,6 +12,10 @@ import { Router } from '@angular/router';
 })
 export class KServeWizardComponent implements OnInit{
   currentStep = 1;
+
+  advancedMode = false;
+
+  yamlData = '';
 
   steps = [
     'Basic Info',
@@ -82,21 +87,33 @@ export class KServeWizardComponent implements OnInit{
 
   wizard = {
     deploymentName: '',
-    runtime: 'custom',
+
+    runtime: 'vLLM',
+
     serviceAccount: 'default',
+
     runtimeImage: '',
+
     namespace: '',
+
     deploymentMode: 'Standard',
+
     description: '',
 
     pvcName: '',
+
     mountPath: '/mnt/models',
+
+    modelPath: '',
+
+    modelFormat: 'vLLM',
 
     cpuRequest: '1',
     cpuLimit: '2',
 
     memoryRequest: '2',
     memoryLimit: '4',
+
     memoryRequestUnit: 'Gi',
     memoryLimitUnit: 'Gi',
 
@@ -115,7 +132,7 @@ export class KServeWizardComponent implements OnInit{
       },
     ],
 
-    command: ``,
+    command: '',
   };
 
   cancel() {
@@ -192,6 +209,128 @@ export class KServeWizardComponent implements OnInit{
   }
 
   private buildInferenceService() {
+
+    const predictor: any = {
+      serviceAccountName: this.wizard.serviceAccount,
+    };
+
+    // GPU node placement
+    if (this.wizard.gpuEnabled) {
+
+      predictor.nodeSelector = {
+        'gpu-model': this.wizard.gpuModel,
+      };
+
+      predictor.tolerations = [
+        {
+          key: 'nvidia.com/gpu',
+          operator: 'Equal',
+          value: 'present',
+          effect: 'NoSchedule',
+        },
+      ];
+    }
+
+    // Built-in Runtime
+    if (this.wizard.runtime !== 'custom') {
+
+      predictor.model = {
+        runtime: this.wizard.runtime,
+
+        modelFormat: {
+          name: this.wizard.runtime,
+        },
+
+        storageUri:
+          `pvc://${this.wizard.pvcName}/${this.wizard.modelPath}`,
+
+        resources: {
+          requests: {
+            cpu: this.wizard.cpuRequest,
+            memory:
+              `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
+          },
+
+          limits: {
+            cpu: this.wizard.cpuLimit,
+            memory:
+              `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
+
+            ...(this.wizard.gpuEnabled && {
+              'nvidia.com/gpu': this.wizard.gpuCount,
+            }),
+          },
+        },
+      };
+
+    }
+
+    // Custom Runtime
+    else {
+
+      predictor.containers = [
+        {
+          name: 'kserve-container',
+
+          image: this.wizard.runtimeImage,
+
+          ports: this.wizard.ports
+            .filter(port => port.name && port.containerPort)
+            .map(port => ({
+              name: port.name,
+              containerPort: Number(port.containerPort),
+            })),
+
+          ...(this.wizard.command?.trim() && {
+            command: [
+              'sh',
+              '-c',
+              this.wizard.command
+                .replace(/\r\n/g, '\n')
+                .trim(),
+            ],
+          }),
+
+          resources: {
+            requests: {
+              cpu: this.wizard.cpuRequest,
+              memory:
+                `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
+            },
+
+            limits: {
+              cpu: this.wizard.cpuLimit,
+              memory:
+                `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
+
+              ...(this.wizard.gpuEnabled && {
+                'nvidia.com/gpu': this.wizard.gpuCount,
+              }),
+            },
+          },
+        },
+      ];
+
+      if (this.wizard.pvcName) {
+
+        predictor.volumes = [
+          {
+            name: 'model-storage',
+            persistentVolumeClaim: {
+              claimName: this.wizard.pvcName,
+            },
+          },
+        ];
+
+        predictor.containers[0].volumeMounts = [
+          {
+            name: 'model-storage',
+            mountPath: this.wizard.mountPath,
+          },
+        ];
+      }
+    }
+
     return {
       apiVersion: 'serving.kserve.io/v1beta1',
 
@@ -199,116 +338,124 @@ export class KServeWizardComponent implements OnInit{
 
       metadata: {
         name: this.wizard.deploymentName,
+
         namespace: this.wizard.namespace,
+
         annotations: {
           'serving.kserve.io/deploymentMode':
             this.wizard.deploymentMode || 'Standard',
-        }
+        },
       },
 
       spec: {
-        predictor: {
-          serviceAccountName: this.wizard.serviceAccount,
-
-          ...(this.wizard.gpuEnabled && {
-            nodeSelector: {
-              'gpu-model': this.wizard.gpuModel,
-            },
-          }),
-
-          ...(this.wizard.gpuEnabled && {
-            tolerations: [
-              {
-                key: 'nvidia.com/gpu',
-                operator: 'Equal',
-                value: 'present',
-                effect: 'NoSchedule',
-              },
-            ],
-          }),
-
-          containers: [
-            {
-              name: 'kserve-container',
-
-              image: this.wizard.runtimeImage,
-
-              ports: this.wizard.ports
-                .filter(port => port.name && port.containerPort)
-                .map(port => ({
-                  name: port.name,
-                  containerPort: Number(port.containerPort),
-                })),
-
-              ...(this.wizard.command?.trim() && {
-                command: [
-                  'sh',
-                  '-c',
-                  this.wizard.command
-                    .replace(/\r\n/g, '\n')
-                    .trim(),
-                ],
-              }),
-
-              resources: {
-                requests: {
-                  cpu: this.wizard.cpuRequest,
-                  memory: `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
-                },
-
-                limits: {
-                  cpu: this.wizard.cpuLimit,
-                  memory: `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
-
-
-                  ...(this.wizard.gpuEnabled && {
-                    'nvidia.com/gpu': this.wizard.gpuCount,
-                  }),
-                },
-              },
-
-              ...(this.wizard.pvcName && {
-                volumeMounts: [
-                  {
-                    name: 'model-storage',
-                    mountPath: this.wizard.mountPath,
-                  },
-                ],
-              }),
-            },
-          ],
-
-          ...(this.wizard.pvcName && {
-            volumes: [
-              {
-                name: 'model-storage',
-                persistentVolumeClaim: {
-                  claimName: this.wizard.pvcName,
-                },
-              },
-            ],
-          }),
-        },
+        predictor,
       },
-    } as any;
+    };
+  }
+
+  private populateWizardFromYaml(cr: any) {
+    this.wizard.deploymentName = cr.metadata?.name || '';
+    this.wizard.namespace = cr.metadata?.namespace || '';
+
+    const predictor = cr.spec?.predictor || {};
+    const container = predictor.containers?.[0] || {};
+
+    this.wizard.serviceAccount =
+      predictor.serviceAccountName || 'default';
+
+    this.wizard.runtimeImage =
+      container.image || '';
+
+    this.wizard.command =
+      container.command?.slice(2).join('\n') || '';
+
+    this.wizard.pvcName =
+      predictor.volumes?.find(
+        v => v.persistentVolumeClaim,
+      )?.persistentVolumeClaim?.claimName || '';
+
+    this.wizard.mountPath =
+      container.volumeMounts?.[0]?.mountPath ||
+      '/mnt/models';
+
+    const requests =
+      container.resources?.requests || {};
+
+    const limits =
+      container.resources?.limits || {};
+
+    this.wizard.cpuRequest =
+      requests.cpu || '1';
+
+    this.wizard.cpuLimit =
+      limits.cpu || '2';
+
+    this.wizard.memoryRequest =
+      (requests.memory || '2Gi').replace('Gi', '');
+
+    this.wizard.memoryLimit =
+      (limits.memory || '4Gi').replace('Gi', '');
+
+    this.wizard.gpuEnabled =
+      !!limits['nvidia.com/gpu'];
+
+    this.wizard.gpuCount =
+      limits['nvidia.com/gpu'] || '1';
+
+    this.wizard.gpuModel =
+      predictor.nodeSelector?.['gpu-model'] || '';
+
+    this.wizard.ports =
+      container.ports?.map(p => ({
+        name: p.name,
+        containerPort: String(p.containerPort),
+      })) || [];
+  }
+
+  toggleAdvancedMode(enabled: boolean) {
+    if (enabled) {
+      this.yamlData = dump(this.buildInferenceService());
+    }
+
+    if (!enabled) {
+      try {
+        const cr = load(this.yamlData);
+        this.populateWizardFromYaml(cr);
+      } catch (e) {
+        alert(
+          'Unable to convert YAML back into Wizard mode.',
+        );
+
+        this.advancedMode = true;
+        return;
+      }
+    }
+
+    this.advancedMode = enabled;
   }
 
   createDeployment() {
-
-    const confirmed = confirm(
-      `Create endpoint "${this.wizard.deploymentName}" in namespace "${this.wizard.namespace}"?`,
-    );
-
-    if (!confirmed) {
-      return;
-    }
 
     if (!this.wizard.deploymentName?.trim()) {
       alert('InferenceService Name is required.');
       return;
     }
 
-    const inferenceService = this.buildInferenceService();
+    let inferenceService;
+
+    if (this.advancedMode) {
+      inferenceService = load(this.yamlData);
+    } else {
+      inferenceService = this.buildInferenceService();
+    }
+
+    const confirmed = confirm(
+      `Create endpoint "${inferenceService.metadata?.name}" in namespace "${inferenceService.metadata?.namespace}"?`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
 
     console.log(
       JSON.stringify(

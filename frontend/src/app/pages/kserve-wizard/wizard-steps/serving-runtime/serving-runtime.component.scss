@@ -56,3 +56,14 @@ label {
 textarea {
   resize: vertical;
 }
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.runtime-toggle {
+  width: 18px;
+  height: 18px;
+}

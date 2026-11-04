@@ -33,9 +33,16 @@
       <strong>{{ wizard.runtime }}</strong>
     </div>
 
-    <div class="summary-row">
+    <div
+      class="summary-row"
+      *ngIf="wizard.runtime === 'custom'">
+
       <span>Runtime Image</span>
-      <strong>{{ wizard.runtimeImage || '-' }}</strong>
+
+      <strong>
+        {{ wizard.runtimeImage || '-' }}
+      </strong>
+
     </div>
 
     <div class="summary-row">
@@ -45,6 +52,7 @@
   </div>
 
   <div class="summary-section" *ngIf="wizard.pvcName">
+
     <h3>Model Source</h3>
 
     <div class="summary-row">
@@ -52,10 +60,27 @@
       <strong>{{ wizard.pvcName }}</strong>
     </div>
 
-    <div class="summary-row">
+    <div
+      class="summary-row"
+      *ngIf="wizard.runtime === 'custom'">
+
       <span>Mount Path</span>
       <strong>{{ wizard.mountPath }}</strong>
+
     </div>
+
+    <div
+      class="summary-row"
+      *ngIf="wizard.runtime !== 'custom'">
+
+      <span>Storage URI</span>
+
+      <strong>
+        pvc://{{ wizard.pvcName }}/{{ wizard.modelPath }}
+      </strong>
+
+    </div>
+
   </div>
 
   <div class="summary-section">

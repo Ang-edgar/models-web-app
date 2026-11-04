@@ -58,32 +58,24 @@ export const defaultConfig: TableConfig = {
       sort: true,
     },
     {
-      matHeaderCellDef: $localize`Predictor`,
-      matColumnDef: 'predictorType',
-      value: new PropertyValue({
-        field: 'ui.predictorType',
+      matHeaderCellDef: $localize`Last Edited`,
+      matColumnDef: 'lastEdited',
+      textAlignment: 'right',
+      value: new DateTimeValue({
+        field: 'ui.lastEdited',
       }),
       sort: true,
     },
     {
-      matHeaderCellDef: $localize`Runtime`,
-      matColumnDef: 'runtimeVersion',
+      matHeaderCellDef: $localize`GPU`,
+      matColumnDef: 'gpu',
       value: new PropertyValue({
-        valueFn: parseRuntime,
-        popoverField: 'ui.runtimeVersion',
+        field: 'ui.gpu',
       }),
       sort: true,
     },
     {
-      matHeaderCellDef: $localize`Protocol`,
-      matColumnDef: 'protocol',
-      value: new PropertyValue({
-        field: 'ui.protocolVersion',
-      }),
-      sort: true,
-    },
-    {
-      matHeaderCellDef: $localize`Storage URI`,
+      matHeaderCellDef: $localize`Model Storage`,
       matColumnDef: 'storageUri',
       value: new ComponentValue({
         component: StorageUriColumnComponent,

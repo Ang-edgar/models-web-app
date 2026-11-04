@@ -25,7 +25,6 @@ import { Subscription } from 'rxjs';
 import { defaultConfig, generateDeleteConfig } from './config';
 import { Router } from '@angular/router';
 import {
-  getPredictorType,
   getK8sObjectUiStatus,
   getPredictorExtensionSpec,
 } from 'src/app/shared/utils';
@@ -347,16 +346,59 @@ export class IndexComponent implements OnInit, OnDestroy {
     inferenceService.ui.actions.delete =
       this.getDeletionActionStatus(inferenceService);
 
-    const predictorType = getPredictorType(
-      inferenceService.spec?.predictor || ({} as any),
-    );
     const predictor = getPredictorExtensionSpec(
       inferenceService.spec?.predictor || ({} as any),
     );
-    inferenceService.ui.predictorType = predictorType;
-    inferenceService.ui.runtimeVersion = predictor.runtimeVersion;
     inferenceService.ui.storageUri = predictor.storageUri;
-    inferenceService.ui.protocolVersion = predictor.protocolVersion || 'v1';
+
+    // Last Edited
+    const managedFields = inferenceService.metadata?.managedFields || [];
+
+    const latestTime = managedFields
+      .map(f => f.time)
+      .filter(Boolean)
+      .sort(
+        (a, b) => new Date(a).getTime() - new Date(b).getTime(),
+      )
+      .pop();
+
+    inferenceService.ui.lastEdited = latestTime
+      ? new Date(latestTime).toISOString()
+      : (inferenceService.metadata?.creationTimestamp
+          ? new Date(inferenceService.metadata.creationTimestamp).toISOString()
+          : '');
+
+    // GPU
+    let gpuInfo = '-';
+
+    const limits =
+      inferenceService.spec?.predictor?.containers?.[0]?.resources?.limits ??
+      {};
+
+    const gpuModel =
+      inferenceService.spec?.predictor?.nodeSelector?.['gpu-model'];
+
+    // MIG
+    const migKey = Object.keys(limits).find(k =>
+      k.startsWith('nvidia.com/mig-'),
+    );
+
+    if (migKey) {
+      const migProfile = migKey.replace('nvidia.com/mig-', '');
+
+      gpuInfo = gpuModel
+        ? `${gpuModel} MIG ${migProfile} × ${limits[migKey]}`
+        : `MIG ${migProfile} × ${limits[migKey]}`;
+    }
+    // Normal GPU
+    else if (limits['nvidia.com/gpu']) {
+      gpuInfo = gpuModel
+        ? `${gpuModel} × ${limits['nvidia.com/gpu']}`
+        : `GPU × ${limits['nvidia.com/gpu']}`;
+    }
+
+    inferenceService.ui.gpu = gpuInfo;
+
     inferenceService.ui.link = {
       text: inferenceService.metadata?.name || '',
       url: `/details/${inferenceService.metadata?.namespace || ''}/${
