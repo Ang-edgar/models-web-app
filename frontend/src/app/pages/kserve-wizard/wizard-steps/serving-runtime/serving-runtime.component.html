@@ -32,6 +32,8 @@
 
     <option value="pmml">PMML</option>
 
+    <option value="tritonserver">Triton</option>
+
     <option value="custom">
       Custom Runtime
     </option>
@@ -192,6 +194,27 @@
     Predictive Model Markup Language models.
 
   </div>
+
+ <!-- Triton -->
+
+  <div
+    class="runtime-hint"
+    *ngIf="wizard.runtime === 'tritonserver'">
+
+    <strong>Triton</strong><br>
+
+    High-performance Ultra-Low Latency & High Throughput inference engine for vision and deep learning models.
+    <ul>
+      <li>ONNX</li>
+      <li>TensorRT</li>
+      <li>PyTorch</li>
+      <li>TensorFlow</li>
+    </ul>
+    Reccomended for AOI AVI on NVIDIA GPUS
+
+  </div>
+
+
 
 </div>
 
