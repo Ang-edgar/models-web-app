@@ -2,7 +2,7 @@
   <main class="content">
     <div class="panel">
 
-      <div *ngIf="advancedMode">
+      <div [hidden]="!advancedMode">
 
         <h2>Advanced Mode</h2>
 

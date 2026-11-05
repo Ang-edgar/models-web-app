@@ -12,16 +12,21 @@ export class ReviewComponent implements OnChanges {
   generatedYaml = '';
 
   ngOnChanges(): void {
+    //console.log('Review ngOnChanges');
     this.buildYaml();
   }
 
 buildYaml(): void {
+
+  console.log('buildYaml called');
+  console.log('wizard:', this.wizard);
+
   const predictor: any = {
     serviceAccountName: this.wizard.serviceAccount,
   };
 
   let container: any = null;
-
+//
   if (this.wizard.runtime === 'custom') {
 
     predictor.containers = [
@@ -32,6 +37,17 @@ buildYaml(): void {
     ];
 
     container = predictor.containers[0];
+
+    container.resources = {
+      requests: {
+        cpu: String(this.wizard.cpuRequest),
+        memory: `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
+      },
+      limits: {
+        cpu: String(this.wizard.cpuLimit),
+        memory: `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
+      },
+    };
 
   } else {
 
@@ -47,14 +63,12 @@ buildYaml(): void {
           cpu: String(this.wizard.cpuRequest),
           memory: `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
         },
-
         limits: {
           cpu: String(this.wizard.cpuLimit),
           memory: `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
         },
       },
     };
-
   }
 
   if (this.wizard.runtime === 'custom') {
@@ -81,18 +95,6 @@ buildYaml(): void {
       ];
     }
   }
-
-    // Resources
-    container.resources = {
-      requests: {
-        cpu: String(this.wizard.cpuRequest),
-        memory: `${this.wizard.memoryRequest}${this.wizard.memoryRequestUnit}`,
-      },
-      limits: {
-        cpu: String(this.wizard.cpuLimit),
-        memory: `${this.wizard.memoryLimit}${this.wizard.memoryLimitUnit}`,
-      },
-    };
 
   // GPU
   if (this.wizard.gpuEnabled) {
@@ -161,10 +163,14 @@ buildYaml(): void {
     },
   };
 
+  console.log('manifest:', manifest);
+
   this.generatedYaml = yaml.dump(manifest, {
     lineWidth: -1,
     noRefs: true,
   });
+
+  console.log('generatedYaml:', this.generatedYaml);
 }
 
   copyYaml(): void {

@@ -94,3 +94,66 @@ textarea {
   border: 1px solid #cbd5e1;
   border-radius: 6px;
 }
+
+.args-toolbar {
+  margin-bottom: 16px;
+}
+
+.args-toolbar mat-form-field {
+  width: 100%;
+  max-width: 500px;
+}
+
+.args-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.args-table th {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+}
+
+.args-table td {
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.args-table input {
+  width: 100%;
+}
+
+.argument-cell {
+  font-family: monospace;
+  font-weight: 600;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  color: #d93025;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.runtime-arg-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.chip {
+  border: 1px solid #d0d7de;
+  border-radius: 16px;
+  padding: 6px 12px;
+  background: #f6f8fa;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.chip:hover {
+  background: #e8f0fe;
+  border-color: #1a73e8;
+}
