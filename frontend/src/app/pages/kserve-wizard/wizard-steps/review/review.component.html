@@ -148,6 +148,28 @@
 
 </div>
 
+<div
+  class="summary-section"
+  *ngIf="wizard.runtimeArgs?.length">
+
+  <h3>Runtime Arguments</h3>
+
+  <div
+    class="summary-row"
+    *ngFor="let arg of wizard.runtimeArgs">
+
+    <span class="arg-name">
+      {{ arg.argument }}
+    </span>
+
+    <strong>
+      {{ arg.value || 'Enabled' }}
+    </strong>
+
+  </div>
+
+</div>
+
 <div class="field">
 
   <label>Generated YAML</label>

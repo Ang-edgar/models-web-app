@@ -28,6 +28,19 @@ export class InferenceServiceBuilder {
     // Built-in Runtime
     if (wizard.runtime !== 'custom') {
 
+        const runtimeArgs =
+            wizard.runtimeArgs
+            .filter(arg => arg.argument)
+            .map(arg => {
+
+                if (!arg.value?.trim()) {
+                return arg.argument;
+                }
+
+                return `${arg.argument}=${arg.value}`;
+
+            });
+
       predictor.model = {
         runtime: wizard.runtime,
 
@@ -37,6 +50,10 @@ export class InferenceServiceBuilder {
 
         storageUri:
           `pvc://${wizard.pvcName}/${wizard.modelPath}`,
+
+        ...(runtimeArgs.length > 0 && {
+        args: runtimeArgs,
+        }),
 
         resources: {
           requests: {
