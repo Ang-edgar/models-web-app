@@ -90,16 +90,38 @@
 
   <aside class="sidebar">
 
-    <h1>KServe Wizard</h1>
+    <div class="sidebar-header">
 
-    <div style="margin-bottom:16px;">
-      <label>
+      <img
+        src="../../../assets/images/kserve.png"
+        alt="KServe"
+        class="sidebar-logo">
+
+      <h1>KServe Wizard</h1>
+
+      <p class="sidebar-description">
+        Create inference service endpoint
+      </p>
+
+    </div>
+
+    <div class="advanced-toggle">
+
+      <span class="toggle-label">
+        Advanced Mode
+      </span>
+
+      <label class="switch">
+
         <input
           type="checkbox"
           [checked]="advancedMode"
           (change)="toggleAdvancedMode($any($event.target).checked)">
-        Advanced Mode
+
+        <span class="slider"></span>
+
       </label>
+
     </div>
 
     <div *ngIf="!advancedMode">
