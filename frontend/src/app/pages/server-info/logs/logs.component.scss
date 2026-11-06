@@ -1,7 +1,7 @@
 .logs-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: calc(100vh - 200px);
 }
 
 .logs-header {
@@ -18,49 +18,99 @@
   font-weight: 500;
 }
 
-.logs-info {
-  font-size: 0.9rem;
-  color: #666;
+.component-tabs {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.container-tabs {
+  height: 100%;
 }
 
 .log-viewer-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 340px);
+  min-height: 500px;
+
   position: relative;
-  height: 500px; /* Should match the height in logs-viewer.component.scss */
-  background-color: #f5f5f5;
+
   border: 1px solid #ddd;
   border-radius: 4px;
+  overflow: hidden;
+}
+
+.logs-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 8px 12px;
+
+  background: #fafafa;
+  border-bottom: 1px solid #ddd;
+}
+
+.logs-toolbar .mat-mdc-form-field,
+.logs-toolbar mat-form-field {
+  margin-bottom: -1.25em;
+}
+
+.search-field {
+  flex: 1;
+  max-width: 500px;
+}
+
+app-logs-viewer {
+  flex: 1;
+  min-height: 0;
 }
 
 .spinner-overlay {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
   z-index: 10;
+
+  transform: translate(-50%, -50%);
 }
 
 .error-msg {
   display: flex;
-  align-items: center;
   justify-content: center;
-  height: 100%;
-  color: #d32f2f;
+  align-items: center;
+
+  flex: 1;
+
   gap: 10px;
+
+  color: #d32f2f;
 }
 
 .no-logs {
   display: flex;
-  align-items: center;
   justify-content: center;
-  height: 100%;
+  align-items: center;
+
+  flex: 1;
+
   color: #666;
 }
 
-/* Override material tab styles if needed */
+.warn-icon {
+  color: #f44336;
+}
+
 ::ng-deep .mat-tab-body-wrapper {
+  flex: 1 !important;
+}
+
+::ng-deep .mat-tab-body {
   height: 100%;
 }
 
-.warn-icon {
-  color: #f44336; /* Material Design Red 500 */
+::ng-deep .mat-tab-body-content {
+  height: 100%;
+  overflow: hidden;
 }

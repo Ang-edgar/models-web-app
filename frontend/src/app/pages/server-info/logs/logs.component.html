@@ -28,31 +28,68 @@
           >
             <ng-template matTabContent>
               <div class="log-viewer-wrapper">
+
+                <div class="logs-toolbar">
+
+                  <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Search Logs</mat-label>
+                    <input
+                      matInput
+                      [(ngModel)]="searchText"
+                      placeholder="Search logs" />                
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Severity</mat-label>
+                    <mat-select [(ngModel)]="severity">
+                      <mat-option value="all">All</mat-option>
+                      <mat-option value="error">Error</mat-option>
+                      <mat-option value="warn">Warning</mat-option>
+                      <mat-option value="info">Info</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <button mat-icon-button matTooltip="Refresh" (click)="refreshLogs()">
+                    <mat-icon>refresh</mat-icon>
+                  </button>
+
+                  <button mat-icon-button matTooltip="Download Logs" (click)="downloadLogs()">
+                    <mat-icon>file_download</mat-icon>
+                  </button>
+
+                  <button mat-icon-button matTooltip="Copy Logs" (click)="copyLogs()">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+
+                </div>
+
                 <lib-loading-spinner
                   *ngIf="!logsRequestCompleted"
-                  class="spinner-overlay"
-                ></lib-loading-spinner>
+                  class="spinner-overlay">
+                </lib-loading-spinner>
 
                 <div *ngIf="loadErrorMsg.length" class="error-msg">
-                  <lib-icon [icon]="'warning'" class="warn-icon"></lib-icon>
+                  <lib-icon icon="warning" class="warn-icon"></lib-icon>
                   <span>{{ loadErrorMsg }}</span>
                 </div>
 
                 <app-logs-viewer
-                  *ngIf="currLogs.length"
-                  [logs]="currLogs"
-                ></app-logs-viewer>
+                  *ngIf="filteredLogs.length"
+                  [logs]="filteredLogs"
+                  [searchText]="searchText">
+                </app-logs-viewer>
 
                 <div
                   *ngIf="
                     logsRequestCompleted &&
-                    !currLogs.length &&
+                    !filteredLogs.length &&
                     !loadErrorMsg.length
                   "
                   class="no-logs"
                 >
                   No logs available for this container.
                 </div>
+
               </div>
             </ng-template>
           </mat-tab>

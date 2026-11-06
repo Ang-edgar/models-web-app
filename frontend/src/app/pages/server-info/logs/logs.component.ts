@@ -11,7 +11,7 @@ enum IsvcComponent {
 }
 
 interface IsvcComponents {
-  IsvcComponent?: { containers: string[] };
+  [key: string]: { containers: string[] };
 }
 
 @Component({
@@ -20,6 +20,9 @@ interface IsvcComponents {
   styleUrls: ['./logs.component.scss'],
 })
 export class LogsComponent implements OnDestroy {
+
+  public searchText = '';
+  public severity = 'all';
   public currLogs: string[] = [];
   public logsRequestCompleted = false;
   public loadErrorMsg = '';
@@ -119,10 +122,9 @@ export class LogsComponent implements OnDestroy {
     this.currentComponent = Object.keys(this.isvcComponents)[index];
 
     if (
-      !(
-        this.currentContainer in
-        this.isvcComponents[this.currentComponent].containers
-      )
+      !this.isvcComponents[
+        this.currentComponent
+      ].containers.includes(this.currentContainer)
     ) {
       this.currentContainer =
         this.isvcComponents[this.currentComponent].containers[0];
@@ -131,10 +133,100 @@ export class LogsComponent implements OnDestroy {
     this.resetLogDisplay();
   }
 
+  get filteredLogs(): string[] {
+    let logs = [...this.currLogs];
+
+    if (this.searchText) {
+      logs = logs.filter(log =>
+        log.toLowerCase().includes(
+          this.searchText.toLowerCase(),
+        ),
+      );
+    }
+
+    switch (this.severity) {
+      case 'error':
+        logs = logs.filter(log =>
+          log.toUpperCase().includes('ERROR'),
+        );
+        break;
+
+      case 'warn':
+        logs = logs.filter(log =>
+          log.toUpperCase().includes('WARN'),
+        );
+        break;
+
+      case 'info':
+        logs = logs.filter(log =>
+          log.toUpperCase().includes('INFO'),
+        );
+        break;
+    }
+
+    return logs;
+  }
+
   containerTabChange(index: number) {
     this.currentContainer =
       this.isvcComponents[this.currentComponent].containers[index];
     this.resetLogDisplay();
+  }
+
+  refreshLogs(): void {
+    if (!this.currentComponent || !this.currentContainer) {
+      return;
+    }
+
+    this.logsRequestCompleted = false;
+
+    this.backend
+      .getInferenceServiceLogs(
+        this.svcPrv,
+        this.currentComponent,
+        this.currentContainer,
+      )
+      .subscribe(
+        logs => {
+          this.currLogs = logs;
+          this.logsRequestCompleted = true;
+          this.loadErrorMsg = '';
+        },
+        error => {
+          this.currLogs = [];
+          this.logsRequestCompleted = true;
+          this.loadErrorMsg = error;
+        },
+      );
+  }
+
+  copyLogs(): void {
+    const text = this.currLogs.join('\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      console.log('Logs copied');
+    });
+  }
+
+  downloadLogs(): void {
+    const text = this.currLogs.join('\n');
+
+    const blob = new Blob([text], {
+      type: 'text/plain',
+    });
+
+    const url = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+
+    a.href = url;
+    a.download =
+      `${this.svcPrv.metadata.name}-` +
+      `${this.currentContainer}.log`;
+
+    a.click();
+
+    window.URL.revokeObjectURL(url);
   }
 
   ngOnDestroy() {
