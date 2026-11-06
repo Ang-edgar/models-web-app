@@ -10,7 +10,7 @@
 
   <select [(ngModel)]="wizard.runtime">
 
-    <option value="vLLM">vLLM</option>
+    <option value="vllmserver">vLLM</option>
 
     <option value="huggingface">HuggingFace</option>
 
@@ -52,7 +52,7 @@
 
   <div
     class="runtime-hint"
-    *ngIf="wizard.runtime === 'vLLM'">
+    *ngIf="wizard.runtime === 'vllmserver'">
 
     <strong>vLLM</strong><br>
 

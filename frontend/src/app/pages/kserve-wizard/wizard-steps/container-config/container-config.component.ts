@@ -50,7 +50,7 @@ export class ContainerConfigComponent
 
     switch (this.wizard.runtime) {
 
-      case 'vLLM':
+      case 'vllmserver':
         return VLLM_ARGS;
 
       case 'huggingface':

@@ -163,7 +163,7 @@ export class KServeWizardComponent implements OnInit, OnDestroy{
   wizard: WizardConfig = {
     deploymentName: '',
 
-    runtime: 'vLLM',
+    runtime: 'vllmserver',
 
     serviceAccount: 'default',
 

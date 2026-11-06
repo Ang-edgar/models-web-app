@@ -360,14 +360,45 @@ def _get_k8s_object(namespace, name, group, version, kind):
 def get_component_latest_pod(
     svc: Dict, component: str
 ) -> Union[api.client.V1Pod, None]:
-    """Get pod of the latest Knative revision for the given component.
 
-    Return:
-        Latest pod: k8s V1Pod
-    """
     namespace = svc["metadata"]["namespace"]
 
-    latest_revision = get_component_latest_revision(svc, component)
+    #
+    # Standard / RawDeployment
+    #
+    if is_standard_deployment(svc):
+
+        name = svc["metadata"]["name"]
+
+        pods = api.v1_core.list_namespaced_pod(
+            namespace,
+            label_selector=(
+                f"serving.kserve.io/inferenceservice={name},"
+                f"component={component}"
+            ),
+        ).items
+
+        if not pods:
+            log.info(
+                f"No pods found for component {component} "
+                f"of inference service {name}"
+            )
+            return None
+
+        pods.sort(
+            key=lambda p: p.metadata.creation_timestamp,
+            reverse=True,
+        )
+
+        return pods[0]
+
+    #
+    # Existing Knative logic
+    #
+    latest_revision = get_component_latest_revision(
+        svc,
+        component
+    )
 
     if latest_revision is None:
         return None
@@ -383,7 +414,11 @@ def get_component_latest_pod(
 
         return pod
 
-    log.info(f"No pods are found for inference service: {svc['metadata']['name']}")
+    log.info(
+        f"No pods are found for inference service: "
+        f"{svc['metadata']['name']}"
+    )
+
     return None
 
 

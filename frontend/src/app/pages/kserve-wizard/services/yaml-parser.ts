@@ -32,7 +32,7 @@ export class YamlParser {
         predictor.model;
 
       wizard.runtime =
-        model.runtime || 'vLLM';
+        model.runtime || 'vllmserver';
 
       const requests =
         model.resources?.requests || {};
