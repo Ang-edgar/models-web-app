@@ -81,7 +81,7 @@ $kubeflow-theme: mat.define-light-theme(
 
 // Use the material icons offline
 $material-icons-font-path: '~material-icons/iconfont/';
-@import '~material-icons/iconfont/material-icons.scss';
+@import 'material-icons/iconfont/material-icons.scss';
 
 // Material Form Field error message
 mat-form-field .mat-form-field {
