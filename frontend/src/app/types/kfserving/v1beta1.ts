@@ -168,7 +168,7 @@ export interface ComponentStatusSpec {
   latestCreatedRevision?: string;
   previousRolledoutRevision?: string;
   latestRolledoutRevision?: string;
-  traffic?: KnativeV1TrafficTarget;
+  traffic?: KnativeV1TrafficTarget[];
   url?: string;
   address: {
     url?: string;
