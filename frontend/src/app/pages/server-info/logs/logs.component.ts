@@ -11,7 +11,7 @@ enum IsvcComponent {
 }
 
 interface IsvcComponents {
-  IsvcComponent?: { containers: string[] };
+  [componentName: string]: { containers: string[] };
 }
 
 @Component({
@@ -23,6 +23,7 @@ export class LogsComponent implements OnDestroy {
   public currLogs: string[] = [];
   public logsRequestCompleted = false;
   public loadErrorMsg = '';
+  public followLogs = false;
 
   public isvcComponents: IsvcComponents = {};
   private currentComponent: string;
@@ -107,6 +108,10 @@ export class LogsComponent implements OnDestroy {
   });
 
   constructor(public backend: MWABackendService) {}
+
+  toggleFollowLogs() {
+    this.followLogs = !this.followLogs;
+  }
 
   resetLogDisplay() {
     this.logsRequestCompleted = false;

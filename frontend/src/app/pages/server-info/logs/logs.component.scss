@@ -18,6 +18,29 @@
   font-weight: 500;
 }
 
+.follow-logs-button {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  font: inherit;
+  padding: 6px 12px;
+}
+
+.follow-logs-button[aria-pressed='true'] {
+  border-color: #4caf50;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.container-label {
+  padding: 8px 0 4px;
+  color: #666;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 .logs-info {
   font-size: 0.9rem;
   color: #666;
