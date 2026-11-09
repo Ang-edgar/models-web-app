@@ -38,6 +38,39 @@
                     />
                   </mat-form-field>
 
+                  <mat-form-field appearance="outline" class="line-count-field">
+                    <mat-label>Lines</mat-label>
+                    <mat-select
+                      [(ngModel)]="lineCount"
+                      (selectionChange)="refreshLogs()"
+                    >
+                      <mat-option
+                        *ngFor="let count of lineCountOptions"
+                        [value]="count"
+                      >
+                        {{ count === 'all' ? 'All' : count }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-slide-toggle
+                    color="primary"
+                    [(ngModel)]="showPreviousLogs"
+                    (change)="refreshLogs()"
+                    matTooltip="Show logs from the previous container instance"
+                  >
+                    Previous
+                  </mat-slide-toggle>
+
+                  <mat-slide-toggle
+                    color="primary"
+                    [(ngModel)]="showTimestamps"
+                    (change)="refreshLogs()"
+                    matTooltip="Include timestamps in log entries"
+                  >
+                    Timestamps
+                  </mat-slide-toggle>
+
                   <mat-form-field appearance="outline">
                     <mat-label>Severity</mat-label>
                     <mat-select [(ngModel)]="severity">
@@ -50,6 +83,7 @@
 
                   <button
                     mat-icon-button
+                    color="primary"
                     matTooltip="Refresh"
                     (click)="refreshLogs()"
                   >
@@ -58,6 +92,7 @@
 
                   <button
                     mat-icon-button
+                    color="primary"
                     matTooltip="Download Logs"
                     (click)="downloadLogs()"
                   >
@@ -66,6 +101,7 @@
 
                   <button
                     mat-icon-button
+                    color="primary"
                     matTooltip="Copy Logs"
                     (click)="copyLogs()"
                   >

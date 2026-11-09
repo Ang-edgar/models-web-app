@@ -8,6 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import {
@@ -35,6 +36,7 @@ import { LogsViewerModule } from './logs-viewer/logs-viewer.module';
     MatSelectModule,
     MatIconModule,
     MatButtonModule,
+    MatSlideToggleModule,
     MatTooltipModule,
 
     LoadingSpinnerModule,

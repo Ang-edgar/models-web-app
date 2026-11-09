@@ -23,6 +23,10 @@ export class LogsComponent implements OnDestroy {
   public searchText = '';
   public severity = 'all';
   public followLogs = true;
+  public lineCount = '100';
+  public readonly lineCountOptions = ['100', '500', '1000', 'all'];
+  public showPreviousLogs = false;
+  public showTimestamps = true;
   public currLogs: string[] = [];
   public logsRequestCompleted = false;
   public loadErrorMsg = '';
@@ -85,6 +89,9 @@ export class LogsComponent implements OnDestroy {
           this.svcPrv,
           this.currentComponent,
           this.currentContainer,
+          this.selectedLineCount,
+          this.showPreviousLogs,
+          this.showTimestamps,
         )
         .subscribe(
           logs => {
@@ -177,6 +184,9 @@ export class LogsComponent implements OnDestroy {
         this.svcPrv,
         this.currentComponent,
         this.currentContainer,
+        this.selectedLineCount,
+        this.showPreviousLogs,
+        this.showTimestamps,
       )
       .subscribe(
         logs => {
@@ -194,6 +204,10 @@ export class LogsComponent implements OnDestroy {
 
   toggleFollowLogs(): void {
     this.followLogs = !this.followLogs;
+  }
+
+  private get selectedLineCount(): number | undefined {
+    return this.lineCount === 'all' ? undefined : Number(this.lineCount);
   }
 
   copyLogs(): void {

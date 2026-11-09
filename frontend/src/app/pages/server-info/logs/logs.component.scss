@@ -62,6 +62,14 @@
   max-width: 500px;
 }
 
+.line-count-field {
+  width: 110px;
+}
+
+.logs-toolbar mat-slide-toggle {
+  margin-bottom: 12px;
+}
+
 app-logs-viewer {
   flex: 1;
   min-height: 0;

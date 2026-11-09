@@ -123,7 +123,35 @@ def get_container_logs(namespace: str, name: str, component: str, container: str
             f"couldn't find latest pod for component: {component}", 404
         )
 
-    logs = api.get_pod_logs(namespace, latest_pod.metadata.name, container, auth=False)
+    tail_lines_value = request.args.get("tailLines", default=None)
+    previous_value = request.args.get("previous", default="false").lower()
+    timestamps_value = request.args.get("timestamps", default="false").lower()
+
+    try:
+        tail_lines = (
+            None
+            if tail_lines_value is None or tail_lines_value.lower() == "all"
+            else int(tail_lines_value)
+        )
+    except (AttributeError, TypeError, ValueError):
+        return api.failed_response("tailLines must be an integer or all", 400)
+
+    if tail_lines is not None and not 1 <= tail_lines <= 5000:
+        return api.failed_response("tailLines must be between 1 and 5000", 400)
+    if previous_value not in {"true", "false"}:
+        return api.failed_response("previous must be true or false", 400)
+    if timestamps_value not in {"true", "false"}:
+        return api.failed_response("timestamps must be true or false", 400)
+
+    logs = api.get_pod_logs(
+        namespace,
+        latest_pod.metadata.name,
+        container,
+        auth=False,
+        tail_lines=tail_lines,
+        previous=previous_value == "true",
+        timestamps=timestamps_value == "true",
+    )
     logs = logs.split("\n")
 
     return api.success_response("logs", logs)

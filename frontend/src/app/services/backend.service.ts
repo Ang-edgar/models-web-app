@@ -273,11 +273,23 @@ export class MWABackendService extends BackendService {
     svc: InferenceServiceK8s,
     component: string,
     container: string,
+    tailLines?: number,
+    previous = false,
+    timestamps = false,
   ): Observable<string[]> {
     const name = svc.metadata.name;
     const namespace = svc.metadata.namespace;
 
-    const url = `api/namespaces/${namespace}/inferenceservices/${name}/components/${component}/pods/containers/${container}/logs`;
+    const queryParameters = new URLSearchParams();
+    if (tailLines !== undefined) {
+      queryParameters.set('tailLines', String(tailLines));
+    }
+    queryParameters.set('previous', String(previous));
+    queryParameters.set('timestamps', String(timestamps));
+
+    const url =
+      `api/namespaces/${namespace}/inferenceservices/${name}/components/` +
+      `${component}/pods/containers/${container}/logs?${queryParameters}`;
 
     return this.http.get<MWABackendResponse>(url).pipe(
       catchError(error => this.handleError(error, false)),
@@ -448,8 +460,8 @@ export class MWABackendService extends BackendService {
   }
 
   /*
-  * START / STOP
-  */
+   * START / STOP
+   */
   public stopInferenceService(
     namespace: string,
     name: string,
