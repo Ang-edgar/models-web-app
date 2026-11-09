@@ -448,6 +448,31 @@ export class MWABackendService extends BackendService {
   }
 
   /*
+  * START / STOP
+  */
+  public stopInferenceService(
+    namespace: string,
+    name: string,
+  ): Observable<MWABackendResponse> {
+    const url = `api/namespaces/${namespace}/inferenceservices/${name}/stop`;
+
+    return this.http
+      .post<MWABackendResponse>(url, {})
+      .pipe(catchError(error => this.handleError(error)));
+  }
+
+  public startInferenceService(
+    namespace: string,
+    name: string,
+  ): Observable<MWABackendResponse> {
+    const url = `api/namespaces/${namespace}/inferenceservices/${name}/start`;
+
+    return this.http
+      .post<MWABackendResponse>(url, {})
+      .pipe(catchError(error => this.handleError(error)));
+  }
+
+  /*
    * DELETE
    */
   public deleteInferenceService(

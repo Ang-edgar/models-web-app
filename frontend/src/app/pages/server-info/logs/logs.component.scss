@@ -114,3 +114,15 @@ app-logs-viewer {
   height: 100%;
   overflow: hidden;
 }
+
+.info-log {
+  color: #81c784;
+}
+
+.warn-log {
+  color: #ffd54f;
+}
+
+.error-log {
+  color: #ff6b6b;
+}

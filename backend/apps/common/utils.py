@@ -206,6 +206,73 @@ def is_modelmesh_deployment(svc):
     deployment_mode = annotations.get("serving.kserve.io/deploymentMode", "")
     return deployment_mode.lower() == "modelmesh"
 
+def get_isvc_components(svc):
+    """
+    Return all enabled InferenceService components.
+    """
+
+    components = []
+
+    spec = svc.get("spec", {})
+
+    for component in [
+        "predictor",
+        "transformer",
+        "explainer",
+    ]:
+        if component in spec:
+            components.append(component)
+
+    return components
+
+def get_isvc_deployment_names(svc):
+    """
+    Return deployment names belonging to an InferenceService.
+    """
+
+    svc_name = svc["metadata"]["name"]
+
+    return [
+        f"{svc_name}-{component}"
+        for component in get_isvc_components(svc)
+    ]
+
+def is_endpoint_stopped(svc):
+    """
+    Return True when all component deployments
+    are scaled to zero.
+    """
+
+    namespace = svc["metadata"]["namespace"]
+
+    try:
+        total_replicas = 0
+
+        for deployment_name in get_isvc_deployment_names(svc):
+
+            deployment = api.get_custom_rsrc(
+                **versions.K8S_DEPLOYMENT,
+                namespace=namespace,
+                name=deployment_name,
+            )
+
+            total_replicas += deployment.get(
+                "spec",
+                {},
+            ).get(
+                "replicas",
+                0,
+            )
+
+        return total_replicas == 0
+
+    except Exception as e:
+        log.warning(
+            f"Failed to determine stopped state for "
+            f"{svc['metadata']['name']}: {e}"
+        )
+
+        return False
 
 def get_deployment_mode(svc):
     """

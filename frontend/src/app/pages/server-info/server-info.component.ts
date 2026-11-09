@@ -43,26 +43,7 @@ export class ServerInfoComponent implements OnInit, OnDestroy {
   public grafanaFound = true;
   public isEditing = false;
   public editingIsvc: InferenceServiceK8s | null = null;
-  public buttonsConfig: ToolbarButton[] = [
-    new ToolbarButton({
-      text: 'EDIT',
-      icon: 'edit',
-      fn: () => {
-        if (!this.inferenceService) {
-          return;
-        }
-        this.editingIsvc = JSON.parse(JSON.stringify(this.inferenceService));
-        this.isEditing = true;
-      },
-    }),
-    new ToolbarButton({
-      text: $localize`DELETE`,
-      icon: 'delete',
-      fn: () => {
-        this.deleteInferenceService();
-      },
-    }),
-  ];
+  public buttonsConfig: ToolbarButton[] = [];
 
   private poller = new ExponentialBackoff({
     interval: 4000,
@@ -205,6 +186,82 @@ export class ServerInfoComponent implements OnInit, OnDestroy {
     this.router.navigate(['/']);
   }
 
+  public stopEndpoint() {
+    if (!this.inferenceService) {
+      return;
+    }
+
+    this.backend
+      .stopInferenceService(
+        this.namespace,
+        this.inferenceService.metadata!.name!,
+      )
+      .subscribe(() => {
+        this.getBackendObjects();
+      });
+  }
+
+  public startEndpoint() {
+    if (!this.inferenceService) {
+      return;
+    }
+
+    this.backend
+      .startInferenceService(
+        this.namespace,
+        this.inferenceService.metadata!.name!,
+      )
+      .subscribe(() => {
+        this.getBackendObjects();
+      });
+  }
+
+  private updateToolbarButtons() {
+    this.buttonsConfig = [
+      new ToolbarButton({
+        text: 'EDIT',
+        icon: 'edit',
+        fn: () => {
+          if (!this.inferenceService) {
+            return;
+          }
+
+          this.editingIsvc = JSON.parse(
+            JSON.stringify(this.inferenceService),
+          );
+
+          this.isEditing = true;
+        },
+      }),
+
+      new ToolbarButton({
+        text: this.inferenceService?.stopped
+          ? 'START'
+          : 'STOP',
+
+        icon: this.inferenceService?.stopped
+          ? 'play_arrow'
+          : 'stop',
+
+        fn: () => {
+          if (this.inferenceService?.stopped) {
+            this.startEndpoint();
+          } else {
+            this.stopEndpoint();
+          }
+        },
+      }),
+
+      new ToolbarButton({
+        text: $localize`DELETE`,
+        icon: 'delete',
+        fn: () => {
+          this.deleteInferenceService();
+        },
+      }),
+    ];
+  }
+
   public deleteInferenceService() {
     const inferenceService = this.inferenceService;
     if (!inferenceService) {
@@ -269,9 +326,12 @@ export class ServerInfoComponent implements OnInit, OnDestroy {
    * based on the data it got. It won't create a new object for every backend
    * request.
    */
-  private updateInferenceService(inferenceService: InferenceServiceK8s) {
+  private updateInferenceService(
+    inferenceService: InferenceServiceK8s,
+  ) {
     if (!this.inferenceService) {
       this.inferenceService = inferenceService;
+      this.updateToolbarButtons();
       return;
     }
 
@@ -286,6 +346,13 @@ export class ServerInfoComponent implements OnInit, OnDestroy {
     if (!isEqual(this.inferenceService.status, inferenceService.status)) {
       this.inferenceService.status = inferenceService.status;
     }
+    this.inferenceService.stopped =
+      inferenceService.stopped;
+
+    this.inferenceService.deploymentMode =
+      inferenceService.deploymentMode;
+
+    this.updateToolbarButtons();
   }
 
   private getOwnedObjects(

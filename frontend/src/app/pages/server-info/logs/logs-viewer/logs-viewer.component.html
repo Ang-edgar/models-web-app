@@ -2,6 +2,11 @@
   <div *cdkVirtualFor="let entry of logs; let index = index" class="log-entry">
     <span class="number">{{ index }}</span>
     <span
+      [ngClass]="{
+        'info-log': entry.toUpperCase().includes('INFO'),
+        'warn-log': entry.toUpperCase().includes('WARN'),
+        'error-log': entry.toUpperCase().includes('ERROR')
+      }"
       [innerHTML]="highlight(entry)">
     </span>
   </div>

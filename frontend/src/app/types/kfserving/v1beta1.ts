@@ -29,6 +29,9 @@ export interface InferenceServiceK8s extends K8sObject {
   metadata?: V1ObjectMeta;
   spec?: InferenceServiceSpec;
   status?: InferenceServiceStatus;
+
+  deploymentMode?: string;
+  stopped?: boolean;
 }
 
 /**

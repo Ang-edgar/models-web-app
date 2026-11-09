@@ -16,11 +16,27 @@ KSERVE_CONTAINER = "kserve-container"
 
 @bp.route("/api/namespaces/<namespace>/inferenceservices")
 def get_inference_services(namespace):
-    """Return a list of InferenceService CRs as json objects."""
-    gvk = versions.inference_service_gvk()
-    inference_services = api.list_custom_rsrc(**gvk, namespace=namespace)
 
-    return api.success_response("inferenceServices", inference_services["items"])
+    gvk = versions.inference_service_gvk()
+
+    inference_services = api.list_custom_rsrc(
+        **gvk,
+        namespace=namespace,
+    )
+
+    for isvc in inference_services["items"]:
+        isvc["deploymentMode"] = (
+            utils.get_deployment_mode(isvc)
+        )
+
+        isvc["stopped"] = (
+            utils.is_endpoint_stopped(isvc)
+        )
+
+    return api.success_response(
+        "inferenceServices",
+        inference_services["items"],
+    )
 
 
 @bp.route("/api/namespaces/<namespace>/inferenceservices/<name>")
@@ -33,6 +49,10 @@ def get_inference_service(namespace, name):
     # deployment mode information to the response
     deployment_mode = utils.get_deployment_mode(inference_service)
     inference_service["deploymentMode"] = deployment_mode
+
+    inference_service["stopped"] = (
+        utils.is_endpoint_stopped(inference_service)
+    )
 
     return api.success_response("inferenceService", inference_service)
 
