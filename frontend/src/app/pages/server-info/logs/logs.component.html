@@ -28,15 +28,14 @@
           >
             <ng-template matTabContent>
               <div class="log-viewer-wrapper">
-
                 <div class="logs-toolbar">
-
                   <mat-form-field appearance="outline" class="search-field">
                     <mat-label>Search Logs</mat-label>
                     <input
                       matInput
                       [(ngModel)]="searchText"
-                      placeholder="Search logs" />                
+                      placeholder="Search logs"
+                    />
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
@@ -49,23 +48,45 @@
                     </mat-select>
                   </mat-form-field>
 
-                  <button mat-icon-button matTooltip="Refresh" (click)="refreshLogs()">
+                  <button
+                    mat-icon-button
+                    matTooltip="Refresh"
+                    (click)="refreshLogs()"
+                  >
                     <mat-icon>refresh</mat-icon>
                   </button>
 
-                  <button mat-icon-button matTooltip="Download Logs" (click)="downloadLogs()">
+                  <button
+                    mat-icon-button
+                    matTooltip="Download Logs"
+                    (click)="downloadLogs()"
+                  >
                     <mat-icon>file_download</mat-icon>
                   </button>
 
-                  <button mat-icon-button matTooltip="Copy Logs" (click)="copyLogs()">
+                  <button
+                    mat-icon-button
+                    matTooltip="Copy Logs"
+                    (click)="copyLogs()"
+                  >
                     <mat-icon>content_copy</mat-icon>
                   </button>
 
+                  <button
+                    mat-stroked-button
+                    color="primary"
+                    [attr.aria-pressed]="followLogs"
+                    (click)="toggleFollowLogs()"
+                  >
+                    <mat-icon>vertical_align_bottom</mat-icon>
+                    {{ followLogs ? 'Following logs' : 'Follow logs' }}
+                  </button>
                 </div>
 
                 <lib-loading-spinner
                   *ngIf="!logsRequestCompleted"
-                  class="spinner-overlay">
+                  class="spinner-overlay"
+                >
                 </lib-loading-spinner>
 
                 <div *ngIf="loadErrorMsg.length" class="error-msg">
@@ -76,7 +97,9 @@
                 <app-logs-viewer
                   *ngIf="filteredLogs.length"
                   [logs]="filteredLogs"
-                  [searchText]="searchText">
+                  [followLogs]="followLogs"
+                  [searchText]="searchText"
+                >
                 </app-logs-viewer>
 
                 <div
@@ -89,7 +112,6 @@
                 >
                   No logs available for this container.
                 </div>
-
               </div>
             </ng-template>
           </mat-tab>

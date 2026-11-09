@@ -6,13 +6,9 @@ import {
   AfterViewInit,
 } from '@angular/core';
 
-import {
-  DomSanitizer,
-  SafeHtml,
-} from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
-
 
 @Component({
   selector: 'app-logs-viewer',
@@ -20,37 +16,42 @@ import { CdkVirtualScrollViewport } from '@angular/cdk/scrolling';
   styleUrls: ['./logs-viewer.component.scss'],
 })
 export class LogsViewerComponent implements AfterViewInit {
-  
   @HostBinding('class.app-logs-viewer') selfClass = true;
   @ViewChild(CdkVirtualScrollViewport, { static: true })
   viewPort: CdkVirtualScrollViewport;
 
-  constructor(
-    private sanitizer: DomSanitizer,
-  ) {}
+  constructor(private sanitizer: DomSanitizer) {}
 
   @Input() height = '400px';
   @Input() searchText = '';
+  private followLogsValue = true;
+
+  @Input()
+  set followLogs(followLogs: boolean) {
+    this.followLogsValue = followLogs;
+
+    if (followLogs) {
+      this.scrollToLatest();
+    }
+  }
+  get followLogs(): boolean {
+    return this.followLogsValue;
+  }
 
   @Input()
   set logs(newLogs: string[]) {
-    const currLogsLength = this.logs.length;
+    const shouldScrollToLatest =
+      this.logs.length !== newLogs.length ||
+      this.logs[this.logs.length - 1] !== newLogs[newLogs.length - 1];
 
     this.logsPrv = newLogs;
 
-    if (!this.logs) {
-      return;
-    }
-
-    if (this.viewPort) {
+    if (shouldScrollToLatest && this.viewPort) {
       this.viewPort.checkViewportSize();
     }
 
-    if (currLogsLength === 0) {
-      setTimeout(() => {
-        const scrollIndex = this.logsPrv.length - 1;
-        this.viewPort.scrollToIndex(scrollIndex, 'smooth');
-      }, 350);
+    if (shouldScrollToLatest) {
+      this.scrollToLatest();
     }
   }
   get logs(): string[] {
@@ -62,27 +63,30 @@ export class LogsViewerComponent implements AfterViewInit {
   ngAfterViewInit() {
     this.viewPort.elementRef.nativeElement.style.height = this.height;
   }
+
+  private scrollToLatest(): void {
+    if (!this.followLogs || !this.viewPort || !this.logs.length) {
+      return;
+    }
+
+    setTimeout(() => {
+      if (this.followLogs && this.logs.length) {
+        this.viewPort.scrollToIndex(this.logs.length - 1, 'smooth');
+      }
+    }, 350);
+  }
+
   highlight(entry: string): SafeHtml {
     if (!this.searchText) {
       return entry;
     }
 
-    const escaped = this.searchText.replace(
-      /[.*+?^${}()|[\]\\]/g,
-      '\\$&',
-    );
+    const escaped = this.searchText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-    const regex = new RegExp(
-      `(${escaped})`,
-      'gi',
-    );
-
+    const regex = new RegExp(`(${escaped})`, 'gi');
 
     return this.sanitizer.bypassSecurityTrustHtml(
-      entry.replace(
-        regex,
-        '<mark>$1</mark>',
-      )
+      entry.replace(regex, '<mark>$1</mark>'),
     );
   }
 }

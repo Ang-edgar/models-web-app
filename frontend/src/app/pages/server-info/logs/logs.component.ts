@@ -20,9 +20,9 @@ interface IsvcComponents {
   styleUrls: ['./logs.component.scss'],
 })
 export class LogsComponent implements OnDestroy {
-
   public searchText = '';
   public severity = 'all';
+  public followLogs = true;
   public currLogs: string[] = [];
   public logsRequestCompleted = false;
   public loadErrorMsg = '';
@@ -122,9 +122,9 @@ export class LogsComponent implements OnDestroy {
     this.currentComponent = Object.keys(this.isvcComponents)[index];
 
     if (
-      !this.isvcComponents[
-        this.currentComponent
-      ].containers.includes(this.currentContainer)
+      !this.isvcComponents[this.currentComponent].containers.includes(
+        this.currentContainer,
+      )
     ) {
       this.currentContainer =
         this.isvcComponents[this.currentComponent].containers[0];
@@ -138,29 +138,21 @@ export class LogsComponent implements OnDestroy {
 
     if (this.searchText) {
       logs = logs.filter(log =>
-        log.toLowerCase().includes(
-          this.searchText.toLowerCase(),
-        ),
+        log.toLowerCase().includes(this.searchText.toLowerCase()),
       );
     }
 
     switch (this.severity) {
       case 'error':
-        logs = logs.filter(log =>
-          log.toUpperCase().includes('ERROR'),
-        );
+        logs = logs.filter(log => log.toUpperCase().includes('ERROR'));
         break;
 
       case 'warn':
-        logs = logs.filter(log =>
-          log.toUpperCase().includes('WARN'),
-        );
+        logs = logs.filter(log => log.toUpperCase().includes('WARN'));
         break;
 
       case 'info':
-        logs = logs.filter(log =>
-          log.toUpperCase().includes('INFO'),
-        );
+        logs = logs.filter(log => log.toUpperCase().includes('INFO'));
         break;
     }
 
@@ -200,6 +192,10 @@ export class LogsComponent implements OnDestroy {
       );
   }
 
+  toggleFollowLogs(): void {
+    this.followLogs = !this.followLogs;
+  }
+
   copyLogs(): void {
     const text = this.currLogs.join('\n');
 
@@ -221,8 +217,7 @@ export class LogsComponent implements OnDestroy {
 
     a.href = url;
     a.download =
-      `${this.svcPrv.metadata.name}-` +
-      `${this.currentContainer}.log`;
+      `${this.svcPrv.metadata.name}-` + `${this.currentContainer}.log`;
 
     a.click();
 
