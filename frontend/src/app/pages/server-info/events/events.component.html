@@ -1,3 +1,13 @@
 <div class="page-padding lib-flex-grow lib-overflow-auto">
-  <lib-table [config]="config" [data]="events"></lib-table>
+  <lib-table
+    *ngIf="events.length > 0"
+    [config]="config"
+    [data]="events"
+  ></lib-table>
+  <div *ngIf="!eventsLoaded" class="empty-state" i18n>
+    Loading endpoint events...
+  </div>
+  <div *ngIf="eventsLoaded && events.length === 0" class="empty-state" i18n>
+    No events found for this endpoint.
+  </div>
 </div>

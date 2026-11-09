@@ -22,7 +22,7 @@ export class LogsViewerComponent implements AfterViewInit {
 
   constructor(private sanitizer: DomSanitizer) {}
 
-  @Input() height = '400px';
+  @Input() height = '100%';
   @Input() searchText = '';
   private followLogsValue = true;
 

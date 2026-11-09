@@ -70,6 +70,11 @@ describe('EventsComponent', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => {
+    fixture.destroy();
+    jest.useRealTimers();
+  });
+
   it('should create', () => {
     expect(component).toBeTruthy();
   });
@@ -80,6 +85,20 @@ describe('EventsComponent', () => {
     sseEvents.next({ type: 'ERROR', message: 'watch failed' });
 
     expect(sseTeardown).toHaveBeenCalled();
+  });
+
+  it('should fall back to polling when the SSE stream sends no initial batch', () => {
+    jest.useFakeTimers();
+    const getEventsSpy = jest.spyOn(
+      MWABackendServiceStub,
+      'getInferenceServiceEvents',
+    );
+
+    component.inferenceService = inferenceService;
+    jest.advanceTimersByTime(10000);
+
+    expect(sseTeardown).toHaveBeenCalled();
+    expect(getEventsSpy).toHaveBeenCalledWith(inferenceService);
   });
 
   it('should request change detection after SSE event updates', () => {
@@ -95,5 +114,17 @@ describe('EventsComponent', () => {
 
     expect(component.events).toEqual([event]);
     expect(detectChangesSpy).toHaveBeenCalled();
+  });
+
+  it('should show an empty state after the initial batch contains no events', () => {
+    component.inferenceService = inferenceService;
+
+    sseEvents.next({ type: 'INITIAL', items: [] });
+    fixture.detectChanges();
+
+    expect(component.eventsLoaded).toBe(true);
+    expect(fixture.nativeElement.textContent).toContain(
+      'No events found for this endpoint.',
+    );
   });
 });

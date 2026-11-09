@@ -13,11 +13,15 @@ import { EventObject } from '../../../types/event';
   styleUrls: ['./events.component.scss'],
 })
 export class EventsComponent implements OnDestroy {
+  private static readonly initialEventsTimeoutMilliseconds = 10000;
+
   public events: EventObject[] = [];
+  public eventsLoaded = false;
   public config = defaultConfig;
   private pollingSubscription = new Subscription();
   private sseSubscription = new Subscription();
   private inferenceServicePrivate: InferenceServiceK8s;
+  private initialEventsTimeout: ReturnType<typeof setTimeout> | null = null;
 
   @Input()
   set inferenceService(s: InferenceServiceK8s) {
@@ -42,12 +46,15 @@ export class EventsComponent implements OnDestroy {
     if (this.sseSubscription) {
       this.sseSubscription.unsubscribe();
     }
+    this.clearInitialEventsTimeout();
   }
 
   private poll(inferenceService: InferenceServiceK8s) {
     this.pollingSubscription?.unsubscribe();
     this.sseSubscription?.unsubscribe();
+    this.clearInitialEventsTimeout();
     this.events = [];
+    this.eventsLoaded = false;
 
     if (!inferenceService) {
       return;
@@ -56,13 +63,20 @@ export class EventsComponent implements OnDestroy {
     const namespace = inferenceService.metadata.namespace;
     const name = inferenceService.metadata.name;
 
+    this.initialEventsTimeout = setTimeout(
+      () => this.fallbackToPolling(inferenceService),
+      EventsComponent.initialEventsTimeoutMilliseconds,
+    );
+
     // Use SSE for real-time event updates
     this.sseSubscription = this.sseService
       .watchEvents<EventObject>(namespace, name)
       .subscribe(
         event => {
           if (event.type === 'INITIAL' && event.items) {
+            this.clearInitialEventsTimeout();
             this.events = event.items;
+            this.eventsLoaded = true;
           } else if (event.type === 'ADDED' && event.object) {
             this.events = [...this.events, event.object];
           } else if (
@@ -94,6 +108,7 @@ export class EventsComponent implements OnDestroy {
   }
 
   private fallbackToPolling(inferenceService: InferenceServiceK8s) {
+    this.clearInitialEventsTimeout();
     this.sseSubscription?.unsubscribe();
     const request = this.backend.getInferenceServiceEvents(inferenceService);
 
@@ -101,6 +116,14 @@ export class EventsComponent implements OnDestroy {
       .exponential(request)
       .subscribe(events => {
         this.events = events;
+        this.eventsLoaded = true;
       });
+  }
+
+  private clearInitialEventsTimeout() {
+    if (this.initialEventsTimeout !== null) {
+      clearTimeout(this.initialEventsTimeout);
+      this.initialEventsTimeout = null;
+    }
   }
 }
