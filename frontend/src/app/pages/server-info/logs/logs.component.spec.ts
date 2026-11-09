@@ -44,14 +44,4 @@ describe('LogsComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
-
-  it('should toggle following new log entries', () => {
-    expect(component.followLogs).toBe(true);
-
-    component.toggleFollowLogs();
-    expect(component.followLogs).toBe(false);
-
-    component.toggleFollowLogs();
-    expect(component.followLogs).toBe(true);
-  });
 });

@@ -1,8 +1,4 @@
 <div class="logs-container">
-  <div class="logs-header">
-    <div class="logs-title">Logs</div>
-  </div>
-
   <mat-tab-group
     #componentTabGroup
     (selectedTabChange)="componentTabChange(componentTabGroup.selectedIndex)"
@@ -29,94 +25,101 @@
             <ng-template matTabContent>
               <div class="log-viewer-wrapper">
                 <div class="logs-toolbar">
-                  <mat-form-field appearance="outline" class="search-field">
-                    <mat-label>Search Logs</mat-label>
-                    <input
-                      matInput
-                      [(ngModel)]="searchText"
-                      placeholder="Search logs"
-                    />
-                  </mat-form-field>
+                  <div class="logs-filters">
+                    <mat-form-field appearance="outline" class="search-field">
+                      <mat-label>Search Logs</mat-label>
+                      <input
+                        matInput
+                        [(ngModel)]="searchText"
+                        placeholder="Search logs"
+                      />
+                    </mat-form-field>
 
-                  <mat-form-field appearance="outline" class="line-count-field">
-                    <mat-label>Lines</mat-label>
-                    <mat-select
-                      [(ngModel)]="lineCount"
-                      (selectionChange)="refreshLogs()"
+                    <mat-form-field
+                      appearance="outline"
+                      class="line-count-field"
                     >
-                      <mat-option
-                        *ngFor="let count of lineCountOptions"
-                        [value]="count"
+                      <mat-label>Lines</mat-label>
+                      <mat-select
+                        [(ngModel)]="lineCount"
+                        (selectionChange)="refreshLogs()"
                       >
-                        {{ count === 'all' ? 'All' : count }}
-                      </mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                        <mat-option
+                          *ngFor="let count of lineCountOptions"
+                          [value]="count"
+                        >
+                          {{ count === 'all' ? 'All' : count }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
 
-                  <mat-slide-toggle
-                    color="primary"
-                    [(ngModel)]="showPreviousLogs"
-                    (change)="refreshLogs()"
-                    matTooltip="Show logs from the previous container instance"
-                  >
-                    Previous
-                  </mat-slide-toggle>
+                    <mat-form-field appearance="outline" class="severity-field">
+                      <mat-label>Severity</mat-label>
+                      <mat-select [(ngModel)]="severity">
+                        <mat-option value="all">All</mat-option>
+                        <mat-option value="error">Error</mat-option>
+                        <mat-option value="warn">Warning</mat-option>
+                        <mat-option value="info">Info</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
 
-                  <mat-slide-toggle
-                    color="primary"
-                    [(ngModel)]="showTimestamps"
-                    (change)="refreshLogs()"
-                    matTooltip="Include timestamps in log entries"
-                  >
-                    Timestamps
-                  </mat-slide-toggle>
+                  <div class="logs-toggles">
+                    <mat-slide-toggle
+                      color="primary"
+                      [(ngModel)]="showPreviousLogs"
+                      (change)="refreshLogs()"
+                      matTooltip="Show logs from the previous container instance"
+                    >
+                      Previous
+                    </mat-slide-toggle>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Severity</mat-label>
-                    <mat-select [(ngModel)]="severity">
-                      <mat-option value="all">All</mat-option>
-                      <mat-option value="error">Error</mat-option>
-                      <mat-option value="warn">Warning</mat-option>
-                      <mat-option value="info">Info</mat-option>
-                    </mat-select>
-                  </mat-form-field>
+                    <mat-slide-toggle
+                      color="primary"
+                      [(ngModel)]="showTimestamps"
+                      (change)="refreshLogs()"
+                      matTooltip="Include timestamps in log entries"
+                    >
+                      Timestamps
+                    </mat-slide-toggle>
 
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    matTooltip="Refresh"
-                    (click)="refreshLogs()"
-                  >
-                    <mat-icon>refresh</mat-icon>
-                  </button>
+                    <mat-slide-toggle
+                      color="primary"
+                      [(ngModel)]="followLogs"
+                      matTooltip="Follow new log entries automatically"
+                    >
+                      Follow logs
+                    </mat-slide-toggle>
+                  </div>
 
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    matTooltip="Download Logs"
-                    (click)="downloadLogs()"
-                  >
-                    <mat-icon>file_download</mat-icon>
-                  </button>
+                  <div class="logs-actions">
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      matTooltip="Refresh"
+                      (click)="refreshLogs()"
+                    >
+                      <mat-icon>refresh</mat-icon>
+                    </button>
 
-                  <button
-                    mat-icon-button
-                    color="primary"
-                    matTooltip="Copy Logs"
-                    (click)="copyLogs()"
-                  >
-                    <mat-icon>content_copy</mat-icon>
-                  </button>
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      matTooltip="Download Logs"
+                      (click)="downloadLogs()"
+                    >
+                      <mat-icon>file_download</mat-icon>
+                    </button>
 
-                  <button
-                    mat-stroked-button
-                    color="primary"
-                    [attr.aria-pressed]="followLogs"
-                    (click)="toggleFollowLogs()"
-                  >
-                    <mat-icon>vertical_align_bottom</mat-icon>
-                    {{ followLogs ? 'Following logs' : 'Follow logs' }}
-                  </button>
+                    <button
+                      mat-icon-button
+                      color="primary"
+                      matTooltip="Copy Logs"
+                      (click)="copyLogs()"
+                    >
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                  </div>
                 </div>
 
                 <lib-loading-spinner

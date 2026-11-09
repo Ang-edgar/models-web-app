@@ -202,10 +202,6 @@ export class LogsComponent implements OnDestroy {
       );
   }
 
-  toggleFollowLogs(): void {
-    this.followLogs = !this.followLogs;
-  }
-
   private get selectedLineCount(): number | undefined {
     return this.lineCount === 'all' ? undefined : Number(this.lineCount);
   }

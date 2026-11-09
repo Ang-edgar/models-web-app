@@ -71,9 +71,10 @@ export class LogsViewerComponent implements AfterViewInit {
 
     setTimeout(() => {
       if (this.followLogs && this.logs.length) {
-        this.viewPort.scrollToIndex(this.logs.length - 1, 'smooth');
+        this.viewPort.checkViewportSize();
+        this.viewPort.scrollToOffset(this.logs.length * 20, 'smooth');
       }
-    }, 350);
+    });
   }
 
   highlight(entry: string): SafeHtml {

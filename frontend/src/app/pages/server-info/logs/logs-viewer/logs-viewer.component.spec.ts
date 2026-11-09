@@ -26,38 +26,38 @@ describe('LogsViewerComponent', () => {
   });
 
   it('scrolls to the latest entry while following logs', fakeAsync(() => {
-    const scrollToIndex = jest
-      .spyOn(component.viewPort, 'scrollToIndex')
+    const scrollToOffset = jest
+      .spyOn(component.viewPort, 'scrollToOffset')
       .mockImplementation(() => {});
 
     component.logs = ['first entry', 'latest entry'];
-    tick(350);
+    tick();
 
-    expect(scrollToIndex).toHaveBeenCalledWith(1, 'smooth');
+    expect(scrollToOffset).toHaveBeenCalledWith(40, 'smooth');
   }));
 
   it('does not scroll to the latest entry when following is paused', fakeAsync(() => {
-    const scrollToIndex = jest
-      .spyOn(component.viewPort, 'scrollToIndex')
+    const scrollToOffset = jest
+      .spyOn(component.viewPort, 'scrollToOffset')
       .mockImplementation(() => {});
 
     component.followLogs = false;
     component.logs = ['first entry', 'latest entry'];
-    tick(350);
+    tick();
 
-    expect(scrollToIndex).not.toHaveBeenCalled();
+    expect(scrollToOffset).not.toHaveBeenCalled();
   }));
 
   it('scrolls to the latest entry when following resumes', fakeAsync(() => {
-    const scrollToIndex = jest
-      .spyOn(component.viewPort, 'scrollToIndex')
+    const scrollToOffset = jest
+      .spyOn(component.viewPort, 'scrollToOffset')
       .mockImplementation(() => {});
 
     component.followLogs = false;
     component.logs = ['first entry', 'latest entry'];
     component.followLogs = true;
-    tick(350);
+    tick();
 
-    expect(scrollToIndex).toHaveBeenCalledWith(1, 'smooth');
+    expect(scrollToOffset).toHaveBeenCalledWith(40, 'smooth');
   }));
 });

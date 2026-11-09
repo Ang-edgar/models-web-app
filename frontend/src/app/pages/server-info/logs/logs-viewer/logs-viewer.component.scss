@@ -6,12 +6,7 @@
   background-color: #1e1e1e;
   color: #d4d4d4;
 
-  font-family:
-    'Monaco',
-    'Menlo',
-    'Ubuntu Mono',
-    'Consolas',
-    'source-code-pro',
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro',
     monospace;
 
   font-size: 13px;
@@ -25,7 +20,9 @@
 
 .log-entry {
   display: flex;
-  white-space: pre-wrap;
+  width: max-content;
+  min-width: 100%;
+  white-space: pre;
   padding: 0 10px;
   line-height: 20px;
 
